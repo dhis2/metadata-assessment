@@ -1,0 +1,101 @@
+---
+title: "DHIS2 Metadata Asessment"
+output:
+  pdf_document: default
+html_document:
+  df_print: paged
+lang: "en-US"
+date: '`r format(Sys.time(), "%d %B, %Y %H:%M")`'
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r include=FALSE}
+require(jsonlite)
+require(httr)
+require(purrr)
+require(knitr)
+
+
+#Perhaps this could be fetched from Github directly?
+dhis_views <- jsonlite::read_json("/home/jason/Downloads/test_metadata_assessment_sqlviews.json")
+#Upload SQL views and set sharing as needed here...
+
+
+views_uids <- dhis_views %>% 
+  purrr::pluck("sqlViews") %>%
+  purrr::map( ~ .x$id) %>% 
+  unlist()
+
+views_names <- dhis_views %>% 
+  purrr::pluck("sqlViews") %>%
+  purrr::map( ~ .x$name) %>% 
+  unlist()
+
+#Login details to the server
+baseurl <- "https://play.dhis2.org/2.36.3/"
+username <- "admin"
+password <- "district"
+
+d2_session <- httr::handle(baseurl)
+me <-httr::GET(paste0(baseurl,"api/me"), authenticate(username,password), handle= d2_session)
+
+if (!me$status_code == 200L) {
+  stop("Could not login to DHIS2")
+}
+
+getSQLView <- function(uid,d2_session) {
+  
+  resp  <- httr::GET(paste0(d2_session$url,"api/sqlViews/",uid,"/data.json"), handle=d2_session) %>% 
+    httr::content("text") %>% 
+    jsonlite::fromJSON(.)
+  headers <- resp$listGrid$headers$column
+  
+  df <- as.data.frame(resp$listGrid$rows,stringsAsFactors = FALSE)
+  
+  colnames(df) <- headers
+  return(df)
+}
+
+```
+
+```{r sql_view_results, asis=TRUE, echo=FALSE}
+
+for (i in seq_along(views_uids)) {
+  r <- getSQLView(views_uids[i],d2_session = d2_session)
+  cat(paste("-",views_names[i]),":",NROW(r), "issues found.")
+  cat("\n")
+  cat(paste0(baseurl,"api/sqlViews/",views_uids[i],"/data.csv"))
+  cat("\n")
+  cat("\n")
+}
+
+
+```
+
+
+
+# Indicators
+
+## Indicators should be in an indicator group
+
+All indicators should be in an indicator group. This allows users to find the indicators more easily in analysis apps and also contributes to having more complete indicators group sets. Maintenance operations can also be made more efficient by applying bulk settings (ex. sharing, filtering) to all indicators within an indicator group.
+
+### Recommendation
+
+Indicators that are not in a indicator group should be added to a relevant indicator group. If the indicators are not needed, they should be deleted.
+
+### Diagnosing if the problem exists
+
+Indicators that are not in an indicator group can be found by running the data integrity check. You can also use the following queries to obtain summaries of these indicators.
+
+#### SQL - Identification
+
+You can identify the number of indicators that are not within an indicator group using the following query (note, this will also give you the total number of existing indicators)
+
+```{r indicators_no_group,  echo=FALSE} 
+r <- getSQLView("YSIbFzxbvNt", d2_session = d2_session)
+kable(r)
+```

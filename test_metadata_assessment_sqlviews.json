@@ -1,0 +1,325 @@
+{
+  "sqlViews": [
+    {
+      "attributeValues": [], 
+      "cacheStrategy": "RESPECT_SYSTEM_SETTING", 
+      "created": "2021-10-04T12:25:23.698", 
+      "createdBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "id": "ZfDKhUoK8TT", 
+      "lastUpdated": "2021-10-04T12:36:56.279", 
+      "lastUpdatedBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "name": "assessment_dashboard_summary", 
+      "sharing": {
+        "external": false, 
+        "owner": "GOLswS44mh8", 
+        "public": "rw------", 
+        "userGroups": {}, 
+        "users": {}
+      }, 
+      "sqlQuery": "select 'dashboard_count' as indicator, count(*)::varchar as value, '100%' as percent, 'Total number of dashboards' as description from dashboard\n\nunion all\n\nselect 'dashboard_empty', count(*)::varchar, (100*count(*)/(select count(*) from dashboard))||'%', 'Dashboards with no content' from dashboard where dashboardid not in (select dashboardid from dashboard_items)\n\n\nunion all\n\nselect 'dashboard_used' as indicator, count(*)::varchar as value, (100*count(*)/(select count(*) from dashboard))||'%', 'Dashboards that have been viewed 1 time or less after 2017' as description from dashboard where uid not in (select favoriteuid from datastatisticsevent where eventtype = 'DASHBOARD_VIEW' and favoriteuid is not null and extract(year from timestamp) >= 2018 group by favoriteuid having count(*) >1)\n\nunion all \n\nselect 'dashboard_used1y' as indicator, count(*)::varchar as value, (100*count(*)/(select count(*) from dashboard))||'%', 'Dashboards that have not been opened in the last 12 months' as description from dashboard where not uid in (select favoriteuid from datastatisticsevent where eventtype = 'DASHBOARD_VIEW' and favoriteuid is not null and timestamp > (now() - INTERVAL '12 months') group by favoriteuid);", 
+      "type": "VIEW"
+    }, 
+    {
+      "attributeValues": [], 
+      "cacheStrategy": "RESPECT_SYSTEM_SETTING", 
+      "created": "2021-10-04T12:53:41.206", 
+      "createdBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "description": "Aggregate data elements not used in any favourites (directly or through indicators)", 
+      "id": "Y7mWJVOW6Sh", 
+      "lastUpdated": "2021-10-04T12:54:28.871", 
+      "lastUpdatedBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "name": "assessment_dataelement_noanalysis", 
+      "sharing": {
+        "external": false, 
+        "owner": "GOLswS44mh8", 
+        "public": "rw------", 
+        "userGroups": {}, 
+        "users": {}
+      }, 
+      "sqlQuery": "select name,uid from dataelement where domaintype = 'AGGREGATE' and dataelementid not in (select de.dataelementid from dataelement de left join indicator ind on (ind.numerator like '%'||de.uid||'%' or ind.denominator like '%'||de.uid||'%') where ind.name is not null and ind.indicatorid in (select indicatorid from datadimensionitem where indicatorid > 0)) and dataelementid not in (select dataelementoperand_dataelementid from datadimensionitem where dataelementoperand_dataelementid > 0) and dataelementid not in (select dataelementid from datadimensionitem where dataelementid > 0) order by name;", 
+      "type": "VIEW"
+    }, 
+    {
+      "attributeValues": [], 
+      "cacheStrategy": "RESPECT_SYSTEM_SETTING", 
+      "created": "2021-10-04T12:22:33.410", 
+      "createdBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "id": "XdrSSXKvirC", 
+      "lastUpdated": "2021-10-04T12:22:33.410", 
+      "lastUpdatedBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "name": "assessment_dataelement_summary", 
+      "sharing": {
+        "external": false, 
+        "owner": "GOLswS44mh8", 
+        "public": "rw------", 
+        "userGroups": {}, 
+        "users": {}
+      }, 
+      "sqlQuery": "with ds_period as (select datasetid, dataelementid, periodid from dataset ds left join period pe using(periodtypeid) left join datasetelement using(datasetid) where date_part('day', now() - pe.enddate::timestamp)::int <= 3*date_part('day', pe.enddate::timestamp - pe.startdate::timestamp)::int)\n\nselect 'dataelement_count' as indicator, count(*)::varchar as value,'100%' as percent, 'Total number of data elements' as description from dataelement\n\nunion all\n\nselect 'dataelement_nongrouped', count(*)::varchar, (100*count(*)/(select count(*) from dataelement))::varchar || '%', 'Data elements not in any data element groups.' from dataelement where domaintype = 'AGGREGATE' and dataelementid not in (select dataelementid from dataelementgroupmembers)\n\nunion all\n\nselect 'dataelement_abandoned',count(*)::varchar , (100*count(*)/(select count(*) from dataelement where domaintype = 'AGGREGATE'))||'%' as percent, 'Aggregate data elements that have not been changed in last 100 days and do not have any data values' from dataelement where domaintype = 'AGGREGATE' and dataelementid not in (select dataelementid from datavalue group by dataelementid) and date_part('day', now() - lastupdated::date) > 100\n\nunion all\n\nselect 'dataelement_noassign',count(*)::varchar , (100*count(*)/(select count(*) from dataelement where domaintype = 'AGGREGATE'))||'%' as percent, 'Aggregate data elements assigned to 1 or less orgunit' from dataelement where (dataelementid not in (select dataelementid from datasetelement)) or (dataelementid in (select dataelementid from datasetelement where datasetid not in (select datasetid from datasetsource)) or  (dataelementid in (select dataelementid from dataelement de left join datasetelement dse using(dataelementid) left join datasetsource dss using(datasetid) group by dataelementid having count(dss.*) = 1)))\n\n\nunion all\n\nselect 'dataelement_nongrouped_newdata', count(*)::varchar, (100*count(*)/(select count(*) from dataelement where domaintype = 'AGGREGATE' ))::varchar || '%', 'Aggregate data elements with data values in the last 3 periods (based on data set period type) that are not in any groups.'  from dataelement where domaintype = 'AGGREGATE' and dataelementid in (select distinct dataelementid from ds_period where (dataelementid,periodid) in (select dataelementid, periodid from datavalue) group by dataelementid) and dataelementid not in (select dataelementid from dataelementgroupmembers)\n\nunion all\n\nselect 'dataelement_nodata', count(*)::varchar , (100*count(*)/(select count(*) from dataelement where domaintype = 'AGGREGATE'))||'%' as percent, 'Aggregate data elements with NO data values' from dataelement where domaintype = 'AGGREGATE' and dataelementid not in (select dataelementid from datavalue group by dataelementid)\n\nunion all\n\nselect 'dataelement_nonewdata', count(*)::varchar, (100*count(*)/(select count(*) from dataelement where domaintype = 'AGGREGATE' ))::varchar || '%', 'Aggregate data elements with no data values in the last 3 periods (based on data set period type).' from dataelement where domaintype = 'AGGREGATE' and dataelementid not in (select distinct dataelementid from ds_period where (dataelementid,periodid) in (select dataelementid, periodid from datavalue) group by dataelementid)\n\nunion all\n\nselect 'dataelement_noanalysis', count(*)::varchar , (100*count(*)/(select count(*) from dataelement where domaintype = 'AGGREGATE'))||'%' as percent, 'Aggregate data elements that are not used in any favourites, either directly or through indicators' from dataelement where domaintype = 'AGGREGATE' and dataelementid not in (select de.dataelementid from dataelement de left join indicator ind on (ind.numerator like '%'||de.uid||'%' or ind.denominator like '%'||de.uid||'%') where ind.name is not null and ind.indicatorid in (select indicatorid from datadimensionitem where indicatorid > 0)) and dataelementid not in (select dataelementoperand_dataelementid from datadimensionitem where dataelementoperand_dataelementid > 0) and dataelementid not in (select dataelementid from datadimensionitem where dataelementid > 0);", 
+      "type": "VIEW"
+    }, 
+    {
+      "attributeValues": [], 
+      "cacheStrategy": "RESPECT_SYSTEM_SETTING", 
+      "created": "2021-10-04T12:50:29.312", 
+      "createdBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "description": "Aggregate data elements assigned to 1 or less orgunit", 
+      "id": "CgGYdobtKun", 
+      "lastUpdated": "2021-10-04T12:51:14.397", 
+      "lastUpdatedBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "name": "assessment_dataelement_unassigned", 
+      "sharing": {
+        "external": false, 
+        "owner": "GOLswS44mh8", 
+        "public": "rw------", 
+        "userGroups": {}, 
+        "users": {}
+      }, 
+      "sqlQuery": "select name,uid from dataelement where (dataelementid not in (select dataelementid from datasetelement)) or (dataelementid in (select dataelementid from datasetelement where datasetid not in (select datasetid from datasetsource)) or  (dataelementid in (select dataelementid from dataelement de left join datasetelement dse using(dataelementid) left join datasetsource dss using(datasetid) group by dataelementid having count(dss.*) = 1))) order by name;", 
+      "type": "VIEW"
+    }, 
+    {
+      "attributeValues": [], 
+      "cacheStrategy": "RESPECT_SYSTEM_SETTING", 
+      "created": "2021-10-04T12:46:04.936", 
+      "createdBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "id": "dCk6UK0W3yI", 
+      "lastUpdated": "2021-10-04T12:46:28.685", 
+      "lastUpdatedBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "name": "assessment_dataset_abandoned", 
+      "sharing": {
+        "external": false, 
+        "owner": "GOLswS44mh8", 
+        "public": "rw------", 
+        "userGroups": {}, 
+        "users": {}
+      }, 
+      "sqlQuery": "select name,uid, lastupdated from dataset where date_part('day', now() - lastupdated::date) > 100 and (datasetid not in (select datasetid from datasetsource) or datasetid in (select datasetid from datasetsource group by datasetid having count(*) = 1))", 
+      "type": "VIEW"
+    }, 
+    {
+      "attributeValues": [], 
+      "cacheStrategy": "RESPECT_SYSTEM_SETTING", 
+      "created": "2021-10-04T12:47:44.572", 
+      "createdBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "id": "JkCG3rE9Suh", 
+      "lastUpdated": "2021-10-04T12:49:10.621", 
+      "lastUpdatedBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "name": "assessment_dataset_no_data_updates", 
+      "sharing": {
+        "external": false, 
+        "owner": "GOLswS44mh8", 
+        "public": "rw------", 
+        "userGroups": {}, 
+        "users": {}
+      }, 
+      "sqlQuery": "with \nds_lastupdate as (select datasetid, avg(date_part('day', pe.enddate::timestamp - pe.startdate::timestamp))::int as interval from dataset ds left join period pe using(periodtypeid) group by datasetid), \nds_period as (select datasetid, dataelementid, periodid from dataset ds left join period pe using(periodtypeid) left join datasetelement using(datasetid) where date_part('day', now() - pe.enddate::timestamp)::int <= 3*date_part('day', pe.enddate::timestamp - pe.startdate::timestamp)::int)\n\nselect name,uid from dataset ds where datasetid not in (select datasetid from datasetelement left join datavalue dv using(dataelementid) left join ds_lastupdate using(datasetid) where date_part('day', now() - dv.lastupdated::timestamp) < ds_lastupdate.interval*3)", 
+      "type": "VIEW"
+    }, 
+    {
+      "attributeValues": [], 
+      "cacheStrategy": "RESPECT_SYSTEM_SETTING", 
+      "created": "2021-10-04T11:55:18.825", 
+      "createdBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "id": "YSIbFzxbvNt", 
+      "lastUpdated": "2021-10-04T12:01:47.102", 
+      "lastUpdatedBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "name": "assessment_dataset_summary", 
+      "sharing": {
+        "external": false, 
+        "owner": "GOLswS44mh8", 
+        "public": "rw------", 
+        "userGroups": {}, 
+        "users": {}
+      }, 
+      "sqlQuery": "with ds_lastupdate as (select datasetid, avg(date_part('day', pe.enddate::timestamp - pe.startdate::timestamp))::int as interval from dataset ds left join period pe using(periodtypeid) group by datasetid), \nds_period as (select datasetid, dataelementid, periodid from dataset ds left join period pe using(periodtypeid) left join datasetelement using(datasetid) where date_part('day', now() - pe.enddate::timestamp)::int <= 3*date_part('day', pe.enddate::timestamp - pe.startdate::timestamp)::int)\n\nselect 'dataset_count' as indicator, count(*)::varchar as value,'100%' as percent, 'Total number of data sets' as description from dataset\n\nunion all\n\nselect 'dataset_abandoned',count(*)::varchar , (100*count(*)/(select count(*) from dataset))||'%' as percent, 'Data sets that have not been changed in last 100 days and are assigned to 1 or less orgunits' from dataset where date_part('day', now() - lastupdated::date) > 100 and (datasetid not in (select datasetid from datasetsource) or datasetid in (select datasetid from datasetsource group by datasetid having count(*) = 1))\n\nunion all\n\nselect 'dataset_noupdateddata', count(*)::varchar, (100*count(*)/(select count(*) from dataset))::varchar || '%', 'Data sets with no data values with lastupdated date within the last 3 periods (based on data set period type). Note: this is not taking into account the reporting period.' from dataset ds where datasetid not in (select datasetid from datasetelement left join datavalue dv using(dataelementid) left join ds_lastupdate using(datasetid) where date_part('day', now() - dv.lastupdated::timestamp) < ds_lastupdate.interval*3)\n\nunion all \n\nselect 'dataset_nonewdata', count(*)::varchar, (100*count(*)/(select count(*) from dataset))::varchar || '%', 'Data sets with no data values in the last 3 periods (based on data set period type).' from dataset where datasetid not in (select distinct datasetid from ds_period where (dataelementid,periodid) in (select dataelementid, periodid from datavalue) group by datasetid);\n", 
+      "type": "VIEW"
+    }, 
+    {
+      "attributeValues": [], 
+      "cacheStrategy": "RESPECT_SYSTEM_SETTING", 
+      "created": "2021-10-04T12:23:51.037", 
+      "createdBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "id": "wpE2t6esrBD", 
+      "lastUpdated": "2021-10-04T12:24:07.742", 
+      "lastUpdatedBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "name": "assessment_indicator_summary", 
+      "sharing": {
+        "external": false, 
+        "owner": "GOLswS44mh8", 
+        "public": "rw------", 
+        "userGroups": {}, 
+        "users": {}
+      }, 
+      "sqlQuery": "select 'indicator_count' as indicator, count(*)::varchar as value, '100%' as percent, 'Total number of indicators' as description from indicator\n\nunion all\n\nselect 'indicator_nongrouped',count(*)::varchar, (100*count(*)/(select count(*) from indicator))||'%', 'Indicators not in any groups' from indicator where indicatorid not in (select indicatorid from indicatorgroupmembers)\n\nunion all\n\nselect 'indicator_nouse',count(*)::varchar, (100*count(*)/(select count(*) from indicator))||'%', 'Indicators not used in favourites OR data sets' from indicator where indicatorid not in (select indicatorid from datadimensionitem where indicatorid > 0) and indicatorid not in (select indicatorid from datasetindicators)\n\nunion all\n\nselect 'indicator_noanalysis',count(*)::varchar, (100*count(*)/(select count(*) from indicator))||'%', 'Indicators not used in favourites' from indicator where indicatorid not in (select indicatorid from datadimensionitem where indicatorid > 0);", 
+      "type": "VIEW"
+    }, 
+    {
+      "attributeValues": [], 
+      "cacheStrategy": "RESPECT_SYSTEM_SETTING", 
+      "created": "2021-10-04T12:44:05.081", 
+      "createdBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "id": "hQCKHwIw2jI", 
+      "lastUpdated": "2021-10-04T12:44:05.081", 
+      "lastUpdatedBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "name": "assessment_map_summary", 
+      "sharing": {
+        "external": false, 
+        "owner": "GOLswS44mh8", 
+        "public": "rw------", 
+        "userGroups": {}, 
+        "users": {}
+      }, 
+      "sqlQuery": "select 'map_count' as indicator, count(*)::varchar as value, '100%' as percent, 'Total number of maps' as description from map\n\nunion all\n\nselect 'map_used' as indicator, count(*)::varchar as value, (100*count(*)/(select count(*) from map))||'%', 'maps that have viewed 1 time or less after 2017' as description from map where uid not in (select favoriteuid from datastatisticsevent where eventtype = 'MAP_VIEW' and favoriteuid is not null and extract(year from timestamp) >= 2018 group by favoriteuid having count(*) >1)\n\nunion all \n\nselect 'map_used1y' as indicator, count(*)::varchar as value, (100*count(*)/(select count(*) from map))||'%', 'maps that have not been opened in the last 12 months' as description from map where uid not in (select favoriteuid from datastatisticsevent where eventtype = 'MAP_VIEW' and favoriteuid is not null and timestamp > (now() - INTERVAL '12 months') group by favoriteuid)\n", 
+      "type": "VIEW"
+    }, 
+    {
+      "attributeValues": [], 
+      "cacheStrategy": "RESPECT_SYSTEM_SETTING", 
+      "created": "2021-10-04T12:24:45.771", 
+      "createdBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "id": "fROi8GkH9UD", 
+      "lastUpdated": "2021-10-04T12:24:45.771", 
+      "lastUpdatedBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "name": "assessment_orgunit_summary", 
+      "sharing": {
+        "external": false, 
+        "owner": "GOLswS44mh8", 
+        "public": "rw------", 
+        "userGroups": {}, 
+        "users": {}
+      }, 
+      "sqlQuery": "with orgunit_compulsory_group_count as (select organisationunitid as orgunitid,count(ogs.orgunitgroupsetid) as actual,(select count(*) as expected from orgunitgroupset where compulsory = true) from orgunitgroupsetmembers ogsm left join orgunitgroupset ogs using(orgunitgroupsetid) left join orgunitgroupmembers ogm using(orgunitgroupid) where ogs.compulsory = true group by ogm.organisationunitid) \n\nselect 'orgunit_count' as indicator, count(*)::varchar as value, '100%' as percent, 'Total number of orgunits' as description from organisationunit\n\nunion all\n\nselect 'orgunit_assignment' as indicator, count(*)::varchar as value, (100*count(*)/(select count(*) from organisationunit))||'%', 'Orgunits at level 5 or below with no data sets assigned' as description from organisationunit where hierarchylevel > 4 and organisationunitid not in (select sourceid from datasetsource)\n\nunion all\n\nselect 'orgunit_notincompulsory', count(*)::varchar , (100*count(*)/(select count(*) from organisationunit))||'%', 'Orgunits that are not in all compulsory orgunit group sets' from orgunit_compulsory_group_count where actual != expected\n\nunion all\n\nselect 'orgunit_assignednotused_combo', count(*)::varchar , (100*count(*)/(select count(*) from datasetsource))||'%', 'Orgunit-dataset combinations with no complete data sets' from datasetsource where (datasetid,sourceid) not in (select datasetid,sourceid from completedatasetregistration group by datasetid,sourceid)\n\nunion all\n\nselect 'orgunit_assignednotused', count(*)::varchar , (100*count(*)/(select count(*) from organisationunit))||'%', 'Orgunits that have not reported on all data sets that are assigned to them.' from organisationunit where organisationunitid in (select sourceid from datasetsource where (datasetid,sourceid) not in (select datasetid,sourceid from completedatasetregistration group by datasetid,sourceid));", 
+      "type": "VIEW"
+    }, 
+    {
+      "attributeValues": [], 
+      "cacheStrategy": "RESPECT_SYSTEM_SETTING", 
+      "created": "2021-10-04T12:39:55.272", 
+      "createdBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "id": "MexgRvZc62K", 
+      "lastUpdated": "2021-10-04T12:42:10.619", 
+      "lastUpdatedBy": {
+        "displayName": "Tom Wakiki", 
+        "id": "GOLswS44mh8", 
+        "name": "Tom Wakiki", 
+        "username": "system"
+      }, 
+      "name": "assessment_vizualisations_summary", 
+      "sharing": {
+        "external": false, 
+        "owner": "GOLswS44mh8", 
+        "public": "rw------", 
+        "userGroups": {}, 
+        "users": {}
+      }, 
+      "sqlQuery": "select 'chart_count' as indicator, count(*)::varchar as value, '100%' as percent, 'Total number of charts' as description from chart\n\nunion all\n\nselect 'chart_used' as indicator, count(*)::varchar as value, (100*count(*)/(select count(*) from chart))||'%', 'Charts that have been viewed 1 time or less after 2017' as description from chart where uid not in (select favoriteuid from datastatisticsevent where eventtype = 'VISUALIZATION_VIEW' and favoriteuid is not null and extract(year from timestamp) >= 2018 group by favoriteuid having count(*) >1)\n\nunion all \n\nselect 'chart_used1y' as indicator, count(*)::varchar as value, (100*count(*)/(select count(*) from chart))||'%', 'Charts that have not been opened in the last 12 months' as description from chart where uid not in (select favoriteuid from datastatisticsevent where eventtype = 'VISUALIZATION_VIEW' and favoriteuid is not null and timestamp > (now() - INTERVAL '12 months') group by favoriteuid)", 
+      "type": "VIEW"
+    }
+  ]
+}
