@@ -1,11 +1,7 @@
 ---
-title: "DHIS2 Metadata Asessment"
-output:
-  pdf_document: default
-html_document:
-  df_print: paged
-lang: "en-US"
-date: '`r format(Sys.time(), "%d %B, %Y %H:%M")`'
+title: "DHIS2 Metadata Assessment"
+author: "DHIS2 Implementation Team"
+date: "`r Sys.Date()`"
 ---
   
 ```{r setup, include=FALSE}
@@ -17,12 +13,16 @@ require(jsonlite)
 require(httr)
 require(purrr)
 require(knitr)
+require(magrittr)
+require(ggplot2)
+
+#Modify login details to the server as needed
+baseurl <- "https://play.dhis2.org/2.36.3/"
+username <- "admin"
+password <- "district"
 
 
-#Perhaps this could be fetched from Github directly?
-dhis_views <- jsonlite::read_json("/home/jason/Downloads/test_metadata_assessment_sqlviews.json")
-#Upload SQL views and set sharing as needed here...
-
+dhis_views <- jsonlite::read_json("test_metadata_assessment_sqlviews.json")
 
 views_uids <- dhis_views %>% 
   purrr::pluck("sqlViews") %>%
@@ -34,11 +34,8 @@ views_names <- dhis_views %>%
   purrr::map( ~ .x$name) %>% 
   unlist()
 
-#Login details to the server
-baseurl <- "https://play.dhis2.org/2.36.3/"
-username <- "admin"
-password <- "district"
 
+#Login to the server
 d2_session <- httr::handle(baseurl)
 me <-httr::GET(paste0(baseurl,"api/me"), authenticate(username,password), handle= d2_session)
 
@@ -46,7 +43,29 @@ if (!me$status_code == 200L) {
   stop("Could not login to DHIS2")
 }
 
+uploadMetadata <- function(payload, d2_session) {
+  url <-paste0(d2_session$url,"api/metadata")
+  r <- httr::POST(url = url,
+             body = jsonlite::toJSON(payload,auto_unbox = TRUE),
+             content_type_json(),
+             handle = d2_session)
+  return(r$status_code)
+}
+
+r <- uploadMetadata(dhis_views, d2_session)
+if (r != 200L) {
+  stop("Could not upload metadata!")
+}
+
 getSQLView <- function(uid,d2_session) {
+  
+  #Execute the view first to be sure its fresh
+  url <- paste0(d2_session$url,"api/sqlViews/",uid,"/execute")
+  r <- httr::POST(url,content_type_json(), handle = d2_session)
+  if (r$status_code != 201L) {
+    warning(paste0("Could not execute view ",uid))
+    return(data.frame())
+  }
   
   resp  <- httr::GET(paste0(d2_session$url,"api/sqlViews/",uid,"/data.json"), handle=d2_session) %>% 
     httr::content("text") %>% 
@@ -61,41 +80,51 @@ getSQLView <- function(uid,d2_session) {
 
 ```
 
-```{r sql_view_results, asis=TRUE, echo=FALSE}
+# Metadata issues
+
+```{r sql_view_results, echo=FALSE,message=FALSE,results="asis"}
 
 for (i in seq_along(views_uids)) {
   r <- getSQLView(views_uids[i],d2_session = d2_session)
+  
+  cat("\n")
   cat(paste("-",views_names[i]),":",NROW(r), "issues found.")
   cat("\n")
-  cat(paste0(baseurl,"api/sqlViews/",views_uids[i],"/data.csv"))
+  cat(paste0("[Dowload details](",baseurl,"api/sqlViews/",views_uids[i],"/data.csv)"))
   cat("\n")
-  cat("\n")
-}
 
+  }
 
 ```
 
+# Users
+
+```{r users, echo=FALSE,message=FALSE}
+
+url <- paste0(d2_session$url,"api/users?paging=false&fields=userCredentials[*]")
+r <-httr::GET(url,content_type_json(),handle=d2_session) %>% 
+  httr::content(.,"text") %>% 
+  jsonlite::fromJSON()
+
+n_users <- length(r$users$userCredentials)
+last_logins <- strptime(r$users$userCredentials$lastLogin,"%Y-%m-%dT%H:%M:%S") 
+last_login_age <- difftime(Sys.time(),last_logins,units="days")
+```
+
+- Total users: `r NROW(r$users$userCredentials)`
+- Total users logged in within 7 days: `r sum(last_login_age <= 7,na.rm = TRUE)`
+- Total users logged in within 30 days: `r sum(last_login_age <= 30,na.rm = TRUE)`
+- Total users logged in within 90 days: `r sum(last_login_age <= 90,na.rm = TRUE)`
+- Total users logged in within a year: `r sum(last_login_age <= 365,na.rm = TRUE)`
+- Users who have never logged in: `r sum(is.na(last_login_age))`
 
 
-# Indicators
 
-## Indicators should be in an indicator group
+```{r users_histogram,  echo=FALSE,message=FALSE, warning=FALSE}
+qplot(as.numeric(last_login_age), 
+geom="histogram",
+main="User login age by day",
+xlab="Days since last logged in",
+ylab="Count")
 
-All indicators should be in an indicator group. This allows users to find the indicators more easily in analysis apps and also contributes to having more complete indicators group sets. Maintenance operations can also be made more efficient by applying bulk settings (ex. sharing, filtering) to all indicators within an indicator group.
-
-### Recommendation
-
-Indicators that are not in a indicator group should be added to a relevant indicator group. If the indicators are not needed, they should be deleted.
-
-### Diagnosing if the problem exists
-
-Indicators that are not in an indicator group can be found by running the data integrity check. You can also use the following queries to obtain summaries of these indicators.
-
-#### SQL - Identification
-
-You can identify the number of indicators that are not within an indicator group using the following query (note, this will also give you the total number of existing indicators)
-
-```{r indicators_no_group,  echo=FALSE} 
-r <- getSQLView("YSIbFzxbvNt", d2_session = d2_session)
-kable(r)
 ```
