@@ -30,6 +30,7 @@ transformSQLtoJSON <- function(filepath) {
           name = character(),
           description = character(),
           sqlQuery = character(),
+          type="QUERY",
           sharing=list(
             external=FALSE,
             public="rwr-----"
@@ -67,4 +68,4 @@ for (this_file in all_sql_files) {
   all_sql_views <- append(all_sql_views,this_sql_sequence)
 }
 
-jsonlite::toJSON(list(sqlViews=all_sql_views),auto_unbox = TRUE)
+cat(jsonlite::toJSON(list(sqlViews=all_sql_views),auto_unbox = TRUE),file="sql_views.json")

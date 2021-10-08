@@ -22,7 +22,7 @@ username <- "admin"
 password <- "district"
 
 
-dhis_views <- jsonlite::read_json("test_metadata_assessment_sqlviews.json")
+dhis_views <- jsonlite::read_json("sql_views.json")
 
 views_uids <- dhis_views %>% 
   purrr::pluck("sqlViews") %>%
@@ -34,6 +34,13 @@ views_names <- dhis_views %>%
   purrr::map( ~ .x$name) %>% 
   unlist()
 
+
+views_descriptions <- dhis_views %>% 
+  purrr::pluck("sqlViews") %>%
+  purrr::map( ~ .x$description) %>% 
+  unlist()
+
+views <-data.frame(id=views_uids,name=views_names,description=views_descriptions,stringsAsFactors = FALSE)
 
 #Login to the server
 d2_session <- httr::handle(baseurl)
@@ -59,13 +66,13 @@ if (r != 200L) {
 
 getSQLView <- function(uid,d2_session) {
   
-  #Execute the view first to be sure its fresh
-  url <- paste0(d2_session$url,"api/sqlViews/",uid,"/execute")
-  r <- httr::POST(url,content_type_json(), handle = d2_session)
-  if (r$status_code != 201L) {
-    warning(paste0("Could not execute view ",uid))
-    return(data.frame())
-  }
+  # #Execute the view first to be sure its fresh
+  # url <- paste0(d2_session$url,"api/sqlViews/",uid,"/execute")
+  # r <- httr::POST(url,content_type_json(), handle = d2_session)
+  # if (r$status_code != 201L) {
+  #   warning(paste0("Could not execute view ",uid))
+  #   return(data.frame())
+  # }
   
   resp  <- httr::GET(paste0(d2_session$url,"api/sqlViews/",uid,"/data.json"), handle=d2_session) %>% 
     httr::content("text") %>% 
@@ -78,19 +85,30 @@ getSQLView <- function(uid,d2_session) {
   return(df)
 }
 
+
+getDetailsUID <- function(name,views) {
+  new_name <- stringr::str_replace(name,"_S","_D")
+  dplyr::filter(views,name == new_name) %>% 
+    dplyr::pull(id)
+}
+
 ```
 
 # Metadata issues
 
 ```{r sql_view_results, echo=FALSE,message=FALSE,results="asis"}
 
-for (i in seq_along(views_uids)) {
-  r <- getSQLView(views_uids[i],d2_session = d2_session)
+summary_views <- views %>% 
+  dplyr::filter(stringr::str_detect(name,"_S$"))
+
+for (i in seq_len(NROW(summary_views))) {
   
+  r <- getSQLView(summary_views$id[i],d2_session = d2_session)
   cat("\n")
-  cat(paste("-",views_names[i]),":",NROW(r), "issues found.")
+  cat(paste("-",summary_views$description[i]),":",r$value, "issues found. (", r$percent,")")
   cat("\n")
-  cat(paste0("[Dowload details](",baseurl,"api/sqlViews/",views_uids[i],"/data.csv)"))
+  details_id <- getDetailsUID(summary_views$name[i],views)
+  cat(paste0("[Dowload details](",baseurl,"api/sqlViews/",details_id,"/data.csv)"))
   cat("\n")
 
   }

@@ -1,6 +1,6 @@
 --type: summary
 --uid: U5DK7LdyJre
---name: Abandoned dashboard summary
+--name: abandoned_dashboards_S
 --description: Dashboards with 1 or fewer views over the past three years
 --detail_uid: Dfjw69AKQln
 select 'dashboard_used' as indicator, 
@@ -14,8 +14,8 @@ and favoriteuid is not null and extract(year from timestamp) >=
 
 --type: details
 --uid: Dfjw69AKQln
---name: Empty dashboard summary
---description: Total number of dashboards with no items
+--name: abandoned_dashboards_D
+--description: Dashboards with 1 or fewer views over the past three years
 SELECT uid,name from dashboard 
 where uid not in (select favoriteuid 
 from datastatisticsevent where eventtype = 'DASHBOARD_VIEW'

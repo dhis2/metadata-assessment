@@ -5,8 +5,8 @@
 --detail_uid: dEwPGTpXYY2
 select 'dashboard_used1y' as indicator,
 count(*)::varchar as value,
-(100*count(*)/(select count(*) from dashboard))||'%', 'Dashboards that have not been
-                opened in the last 12 months' as description from
+(100*count(*)/(select count(*) from dashboard))||'%' as percent,
+'Dashboards that have not been opened in the last 12 months' as description from
                  dashboard where not uid in (select favoriteuid
                   from datastatisticsevent where eventtype =
                    'DASHBOARD_VIEW' and favoriteuid is not null 
@@ -15,7 +15,7 @@ count(*)::varchar as value,
 
 --type: details
 --uid: dEwPGTpXYY2
---name:  assessment_dashboards_no_views_1y_D
+--name: assessment_dashboards_no_views_1y_D
 --description:  Dashboards not viewed in the past year
 SELECT uid,name from dashboard 
 where not uid in (select favoriteuid

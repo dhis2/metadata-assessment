@@ -4,9 +4,10 @@
 --description: Total number of dashboards with no items
 --detail_uid: NMZhvSZpTtW
 
-select 'dashboard_empty', count(*)::varchar,
-       (100*count(*)/(select count(*) from dashboard))||'%',
-        'Dashboards with no content' from dashboard where
+select 'dashboard_empty' as indicator, 
+count(*)::varchar as value,
+       (100*count(*)/(select count(*) from dashboard))||'%' as percent,
+        'Dashboards with no content' as description from dashboard where
          dashboardid not in (select dashboardid from dashboard_items);
       
 --type: details
