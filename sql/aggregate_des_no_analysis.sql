@@ -15,7 +15,7 @@ not in (select dataelementid from datadimensionitem where dataelementid > 0) ord
 )
 SELECT 'agg_des_no_analysis' as indicator,
 COUNT(*) as value,
-ROUND(( COUNT(*)::numeric / ( SELECT COUNT(*) FROM dataelement where domaintype = 'AGGREGATE' )::numeric) * 100)::varchar || "%" as percent,
+ROUND(( COUNT(*)::numeric / ( SELECT COUNT(*) FROM dataelement where domaintype = 'AGGREGATE' )::numeric) * 100)::varchar || '%' as percent,
 'Aggregate data elements not used in any favourites (directly or through indicators)' as description
 FROM des_no_analysis;
 
