@@ -20,4 +20,5 @@ SELECT uid,name from dashboard
 where uid not in (select favoriteuid 
 from datastatisticsevent where eventtype = 'DASHBOARD_VIEW'
 and favoriteuid is not null and extract(year from timestamp) >= 
-( extract(year from now()) -3 ) group by favoriteuid having count(*) >1);
+( extract(year from now()) -3 ) group by favoriteuid having count(*) >1)
+ORDER BY name;

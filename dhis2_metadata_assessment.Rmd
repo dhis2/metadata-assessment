@@ -59,10 +59,10 @@ uploadMetadata <- function(payload, d2_session) {
   return(r$status_code)
 }
 
-r <- uploadMetadata(dhis_views, d2_session)
-if (r != 200L) {
-  stop("Could not upload metadata!")
-}
+ r <- uploadMetadata(dhis_views, d2_session)
+ if (r != 200L) {
+   stop("Could not upload metadata!")
+ }
 
 getSQLView <- function(uid,d2_session) {
   
@@ -74,7 +74,9 @@ getSQLView <- function(uid,d2_session) {
   #   return(data.frame())
   # }
   
-  resp  <- httr::GET(paste0(d2_session$url,"api/sqlViews/",uid,"/data.json"), handle=d2_session) %>% 
+  resp  <- httr::GET(paste0(d2_session$url,"api/sqlViews/",uid,"/data.json"), 
+                     handle=d2_session,
+                     timeout(600)) %>% 
     httr::content("text") %>% 
     jsonlite::fromJSON(.)
   headers <- resp$listGrid$headers$column

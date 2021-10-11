@@ -31,4 +31,4 @@ ind.denominator like '%'||de.uid||'%') where ind.name is not null
 and ind.indicatorid in (select indicatorid from datadimensionitem where indicatorid > 0))
 and dataelementid not in (select dataelementoperand_dataelementid from datadimensionitem
 where dataelementoperand_dataelementid > 0) and dataelementid
-not in (select dataelementid from datadimensionitem where dataelementid > 0) order by name
+not in (select dataelementid from datadimensionitem where dataelementid > 0) order by name;
