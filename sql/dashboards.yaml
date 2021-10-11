@@ -1,0 +1,15 @@
+---
+  name: assessment_dashboards
+  description: Total number of dashboards in the system
+  summary_uid: G7Z1WmUiuuR
+  summary_sql: >-
+    select 'dashboard_count' as indicator,
+    count(*)::varchar as value,
+    '100%' as percent,
+    'Total number of dashboards' as description
+    from dashboard;
+  details_uid: WAgKp3hIWzF
+  details_sql: >-
+    select uid,name
+    from dashboard
+    LIMIT 1000;
