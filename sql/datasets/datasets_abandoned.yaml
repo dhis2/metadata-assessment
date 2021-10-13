@@ -1,6 +1,8 @@
 ---
   name: datasets_abandoned
   description: Data sets that have not been changed in last 100 days and are assigned to 1 or less orgunits
+  section: Datasets
+  section_order: 2
   summary_uid: jliUzKxgkkH
   summary_sql: >-
      select 'dataset_abandoned' as indicator,

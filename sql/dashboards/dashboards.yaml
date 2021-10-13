@@ -1,6 +1,8 @@
 ---
   name: assessment_dashboards
   description: Total number of dashboards in the system
+  section: Dashboards
+  section_order: 1
   summary_uid: G7Z1WmUiuuR
   summary_sql: >-
     select 'dashboard_count' as indicator,

@@ -58,13 +58,47 @@ transformSQLtoJSON <- function(filepath) {
 }
 
 
+tranformYAMLtoJSON <- function(filepath) {
+  r <- yaml::read_yaml(filepath)
+  
+  summary_sql <- list(id = r$summary_uid,
+                      name = paste0(r$name,"_S"),
+                      description = r$description,
+                      sqlQuery = r$summary_sql,
+                      type = "QUERY",
+                      sharing=list(
+                        external=FALSE,
+                        public="rwr-----"
+                      )
+  )
+  details_sql <- list(id = r$details_uid,
+                      name = paste0(r$name,"_D"),
+                      description = r$description,
+                      sqlQuery = r$details_sql,
+                      type = "QUERY",
+                      sharing=list(
+                        external=FALSE,
+                        public="rwr-----"
+                      ))
+  list(summary_sql,details_sql)
+                      
+}
 
-all_sql_files<-list.files("sql/",pattern="*.sql")
+
+tranformYAMLtoControlFile<-function() {
+  all_yaml_files<-list.files("sql/",pattern="*.yaml",recursive = TRUE,full.names = TRUE)
+  purrr::map_dfr(all_yaml_files, yaml::read_yaml) %>% 
+  dplyr::arrange(section,section_order)
+}
+
+
+
+
 
 all_sql_views <-list()
-for (this_file in all_sql_files) {
+for (this_file in all_yaml_files) {
   filepath <- paste0("sql/",this_file)
-  this_sql_sequence<-transformSQLtoJSON(filepath)
+  this_sql_sequence<-tranformYAMLtoJSON(filepath)
   all_sql_views <- append(all_sql_views,this_sql_sequence)
 }
 

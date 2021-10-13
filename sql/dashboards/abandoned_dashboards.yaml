@@ -2,6 +2,8 @@
   summary_uid: U5DK7LdyJre
   name: abandoned_dashboards
   description: Dashboards with 1 or fewer views over the past three years
+  section: Dashboards
+  section_order: 2
   summary_sql: >-
    select 'dashboard_used' as indicator,
    count(*)::varchar as value,

@@ -1,6 +1,8 @@
 ---
   name: assessment_dashboards_no_views_1y
   description: Dashboards not viewed in the past one year
+  section: Dashboards
+  section_order: 3
   summary_uid: BsJqjX8CK2y
   summary_sql: >-
     select 'dashboard_used1y' as indicator,

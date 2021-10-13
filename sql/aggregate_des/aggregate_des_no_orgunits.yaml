@@ -1,6 +1,8 @@
 ---
   name: des_no_orgunits
   description: Aggregate data elements assigned to 1 or less orgunit
+  section: Data elements
+  section_order: 2
   summary_uid: hN9QvyXRdQC
   summary_sql: >
      WITH des_no_orgunits AS (

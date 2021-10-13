@@ -2,7 +2,8 @@
   name: aggregate_des_no_analysis
   summary_uid: lY1DmLxMl7h
   description: Aggregate data elements not used in any favourites (directly or through indicators)
-  summary_uid: EFyNHwRu9w8
+  section: Data elements
+  section_order: 1
   summary_sql: >-
     WITH des_no_analysis AS (
     select name,uid from dataelement where domaintype = 'AGGREGATE' and

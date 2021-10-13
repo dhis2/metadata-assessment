@@ -15,6 +15,7 @@ require(purrr)
 require(knitr)
 require(magrittr)
 require(ggplot2)
+require(DT)
 
 #Modify login details to the server as needed
 baseurl <- Sys.getenv("baseurl")
@@ -84,7 +85,10 @@ getSQLView <- function(uid,d2_session) {
   df <- as.data.frame(resp$listGrid$rows,stringsAsFactors = FALSE)
   
   colnames(df) <- headers
-  return(df)
+  if ( NROW(df) == 0) {
+    return(NULL) } 
+  
+  df
 }
 
 
@@ -96,28 +100,22 @@ getDetailsUID <- function(name,views) {
 
 ```
 
-# Metadata issues
+# Target server: `r baseurl`
+
+## Metadata issues
 
 ```{r sql_view_results, echo=FALSE,message=FALSE,results="asis"}
 
 summary_views <- views %>% 
   dplyr::filter(stringr::str_detect(name,"_S$"))
 
-for (i in seq_len(NROW(summary_views))) {
-  
-  r <- getSQLView(summary_views$id[i],d2_session = d2_session)
-  cat("\n")
-  cat(paste("-",summary_views$description[i]),":",r$value, "issues found. (", r$percent,")")
-  cat("\n")
-  details_id <- getDetailsUID(summary_views$name[i],views)
-  cat(paste0("[Dowload details](",baseurl,"api/sqlViews/",details_id,"/data.csv)"))
-  cat("\n")
+results<-purrr::map_dfr(summary_views$id,function(x) getSQLView(x,d2_session = d2_session))
 
-  }
+DT::datatable(results)
 
 ```
 
-# Users
+## Users
 
 ```{r users, echo=FALSE,message=FALSE}
 
