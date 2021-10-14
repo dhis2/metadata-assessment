@@ -16,32 +16,19 @@ require(knitr)
 require(magrittr)
 require(ggplot2)
 require(DT)
+require(dplyr)
 
+
+source("R/utils.R")
 #Modify login details to the server as needed
 baseurl <- Sys.getenv("baseurl")
 username <- Sys.getenv("username")
 password <- Sys.getenv("password")
 
 
-dhis_views <- jsonlite::read_json("sql_views.json")
+views <- transformYAMLtoControlFile()
 
-views_uids <- dhis_views %>% 
-  purrr::pluck("sqlViews") %>%
-  purrr::map( ~ .x$id) %>% 
-  unlist()
-
-views_names <- dhis_views %>% 
-  purrr::pluck("sqlViews") %>%
-  purrr::map( ~ .x$name) %>% 
-  unlist()
-
-
-views_descriptions <- dhis_views %>% 
-  purrr::pluck("sqlViews") %>%
-  purrr::map( ~ .x$description) %>% 
-  unlist()
-
-views <-data.frame(id=views_uids,name=views_names,description=views_descriptions,stringsAsFactors = FALSE)
+metadata <- transformYAMLtoMetadata()
 
 #Login to the server
 d2_session <- httr::handle(baseurl)
@@ -51,52 +38,11 @@ if (!me$status_code == 200L) {
   stop("Could not login to DHIS2")
 }
 
-uploadMetadata <- function(payload, d2_session) {
-  url <-paste0(d2_session$url,"api/metadata")
-  r <- httr::POST(url = url,
-             body = jsonlite::toJSON(payload,auto_unbox = TRUE),
-             content_type_json(),
-             handle = d2_session)
-  return(r$status_code)
-}
-
- r <- uploadMetadata(dhis_views, d2_session)
- if (r != 200L) {
+ r <- uploadMetadata(metadata, d2_session)
+ if (r$status_code != 200L) {
    stop("Could not upload metadata!")
  }
 
-getSQLView <- function(uid,d2_session) {
-  
-  # #Execute the view first to be sure its fresh
-  # url <- paste0(d2_session$url,"api/sqlViews/",uid,"/execute")
-  # r <- httr::POST(url,content_type_json(), handle = d2_session)
-  # if (r$status_code != 201L) {
-  #   warning(paste0("Could not execute view ",uid))
-  #   return(data.frame())
-  # }
-  
-  resp  <- httr::GET(paste0(d2_session$url,"api/sqlViews/",uid,"/data.json"), 
-                     handle=d2_session,
-                     timeout(600)) %>% 
-    httr::content("text") %>% 
-    jsonlite::fromJSON(.)
-  headers <- resp$listGrid$headers$column
-  
-  df <- as.data.frame(resp$listGrid$rows,stringsAsFactors = FALSE)
-  
-  colnames(df) <- headers
-  if ( NROW(df) == 0) {
-    return(NULL) } 
-  
-  df
-}
-
-
-getDetailsUID <- function(name,views) {
-  new_name <- stringr::str_replace(name,"_S","_D")
-  dplyr::filter(views,name == new_name) %>% 
-    dplyr::pull(id)
-}
 
 ```
 
@@ -106,10 +52,16 @@ getDetailsUID <- function(name,views) {
 
 ```{r sql_view_results, echo=FALSE,message=FALSE,results="asis"}
 
-summary_views <- views %>% 
-  dplyr::filter(stringr::str_detect(name,"_S$"))
+summary_views <- views$summary_uid
 
-results<-purrr::map_dfr(summary_views$id,function(x) getSQLView(x,d2_session = d2_session))
+results<-purrr::map_dfr(views$summary_uid,function(x) getSQLView(x,d2_session = d2_session)) %>% 
+  dplyr::left_join(views[,c("summary_uid","section","section_order")] , by =c("uid"="summary_uid")) %>% 
+  dplyr::arrange(section,section_order) %>% 
+  dplyr::select( "Theme" = section,
+    "Issue" = description,
+                "Count" = ,
+                "Percentage" = percent )
+
 
 DT::datatable(results)
 

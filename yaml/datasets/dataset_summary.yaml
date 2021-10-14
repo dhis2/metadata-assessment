@@ -29,7 +29,7 @@
   name: dataset_summary
   description: Total number of data sets
   section: Datasets
-  section_order: 2
+  section_order: 1
   summary_sql: >-
     with ds_lastupdate as (select datasetid, avg(date_part('day', pe.enddate::timestamp - pe.startdate::timestamp))::int as interval from dataset ds
     left join period pe using(periodtypeid) group by datasetid),

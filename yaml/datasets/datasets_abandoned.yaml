@@ -31,7 +31,7 @@
   section_order: 2
   summary_uid: jliUzKxgkkH
   summary_sql: >-
-     select 'dataset_abandoned' as indicator,
+     select 'datasets_abandoned' as indicator,
      count(*)::varchar as value ,
      (100*count(*)/(select count(*) from dataset)) || '%' as percent,
      'Data sets that have not been changed in last 100 days and are assigned to 1 or less orgunits' as description
