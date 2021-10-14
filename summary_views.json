@@ -1,0 +1,142 @@
+{
+    "sqlViews": [
+      {
+        "attributeValues": [],
+        "cacheStrategy": "RESPECT_SYSTEM_SETTING",
+        "created": "2021-10-04T12:25:23.698",
+        "createdBy": {
+          "displayName": "Tom Wakiki",
+          "id": "GOLswS44mh8",
+          "name": "Tom Wakiki",
+          "username": "system"
+        },
+        "id": "kqUV1oXv2vj",
+        "lastUpdated": "2021-10-04T12:36:56.279",
+        "lastUpdatedBy": {
+          "displayName": "Tom Wakiki",
+          "id": "GOLswS44mh8",
+          "name": "Tom Wakiki",
+          "username": "system"
+        },
+        "name": "assessment_Number of dashboards",
+        "sharing": {
+          "external": false,
+          "owner": "GOLswS44mh8",
+          "public": "rwr-----",
+          "userGroups": {},
+          "users": {}
+        },
+        "sqlQuery": "select 'dashboard_count' as indicator,
+        count(*)::varchar as value,
+        '100%' as percent, 'Total number of dashboards' as description
+        from dashboard",
+        "type": "VIEW"
+      },
+      {
+        "attributeValues": [],
+        "cacheStrategy": "RESPECT_SYSTEM_SETTING",
+        "created": "2021-10-04T12:25:23.698",
+        "createdBy": {
+          "displayName": "Tom Wakiki",
+          "id": "GOLswS44mh8",
+          "name": "Tom Wakiki",
+          "username": "system"
+        },
+        "id": "DJLgyOZWFs2",
+        "lastUpdated": "2021-10-04T12:36:56.279",
+        "lastUpdatedBy": {
+          "displayName": "Tom Wakiki",
+          "id": "GOLswS44mh8",
+          "name": "Tom Wakiki",
+          "username": "system"
+        },
+        "name": "assessment_empty_dashboards",
+        "sharing": {
+          "external": false,
+          "owner": "GOLswS44mh8",
+          "public": "rwr-----",
+          "userGroups": {},
+          "users": {}
+        },
+        "sqlQuery": "select 'dashboard_empty' as indicator,  count(*)::varchar as value, (100*count(*)/(select count(*) from dashboard))||'%' as percent,
+        'Dashboards with no content' as description from dashboard
+        where dashboardid not in (select
+        dashboardid from dashboard_items)",
+        "type": "VIEW"
+      },
+      {
+        "attributeValues": [],
+        "cacheStrategy": "RESPECT_SYSTEM_SETTING",
+        "created": "2021-10-04T12:25:23.698",
+        "createdBy": {
+          "displayName": "Tom Wakiki",
+          "id": "GOLswS44mh8",
+          "name": "Tom Wakiki",
+          "username": "system"
+        },
+        "id": "q7LbeTaR2m7",
+        "lastUpdated": "2021-10-04T12:36:56.279",
+        "lastUpdatedBy": {
+          "displayName": "Tom Wakiki",
+          "id": "GOLswS44mh8",
+          "name": "Tom Wakiki",
+          "username": "system"
+        },
+        "name": "assessment_abandoned_dashboards",
+        "sharing": {
+          "external": false,
+          "owner": "GOLswS44mh8",
+          "public": "rwr-----",
+          "userGroups": {},
+          "users": {}
+        },
+        "sqlQuery": "SELECT
+        'dashboard_used' as indicator, count(*)::varchar as value,
+         (100*count(*)/(select count(*) from dashboard))||'%',
+         'Dashboards that have been viewed at least once in the past three years'
+         as description from dashboard where uid not in
+         (select favoriteuid from datastatisticsevent where
+          eventtype = 'DASHBOARD_VIEW' and favoriteuid is not
+           null and extract(year from timestamp) >= (extract(year from now()) - 3)  group by
+            favoriteuid having count(*) >1)",
+        "type": "VIEW"
+      },
+      {
+        "attributeValues": [],
+        "cacheStrategy": "RESPECT_SYSTEM_SETTING",
+        "created": "2021-10-04T12:25:23.698",
+        "createdBy": {
+          "displayName": "Tom Wakiki",
+          "id": "GOLswS44mh8",
+          "name": "Tom Wakiki",
+          "username": "system"
+        },
+        "id": "q7LbeTaR2m7",
+        "lastUpdated": "2021-10-04T12:36:56.279",
+        "lastUpdatedBy": {
+          "displayName": "Tom Wakiki",
+          "id": "GOLswS44mh8",
+          "name": "Tom Wakiki",
+          "username": "system"
+        },
+        "name": "assessment_abandoned_dashboards",
+        "sharing": {
+          "external": false,
+          "owner": "GOLswS44mh8",
+          "public": "rwr-----",
+          "userGroups": {},
+          "users": {}
+        },
+        "sqlQuery": "select
+        'dashboard_used1y' as indicator, count(*)::varchar as value,
+        (100*count(*)/(select count(*) from dashboard))||'%' as percent,
+        'Dashboards that have not been opened in the last 12 months'
+        as description from dashboard where not uid in
+        (select favoriteuid from datastatisticsevent where
+        eventtype = 'DASHBOARD_VIEW' and favoriteuid is not null
+         and timestamp > (now() - INTERVAL '12 months') group by favoriteuid);",
+        "type": "VIEW"
+      }
+  ]
+}
+
