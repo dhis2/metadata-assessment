@@ -36,7 +36,8 @@
      where (dataelementid not in (select dataelementid from datasetelement))
      AND domaintype = 'AGGREGATE'
      or (dataelementid in
-     (select dataelementid from datasetelement where datasetid 
+     (select dataelementid from datasetelement 
+     where datasetid 
      not in (select datasetid from datasetsource))
      or  (dataelementid in (select dataelementid from dataelement de
      left join datasetelement dse using (dataelementid)
