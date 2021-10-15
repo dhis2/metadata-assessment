@@ -1,33 +1,25 @@
-SQL files for the metadata assessment report should consist of a pair of queries.
+SQL files for the metadata assessment report should consist of a pair of queries
+defined in a YAML control file. 
 These queries are meant to be able to be used in both the metadata assessment
 report as well as interactively on the database by copying and pasting. 
 However, in order to ensure that the queries can be imported as metadata
-into DHIS2, a semi-structued text file is used to provide necessary 
+into DHIS2, a structured text file is used to provide necessary 
 bits of information. 
 
-The header of each set of queries should contain the following formatted text. 
+Each YAML file should contain the following fields. 
+- name: This will be the name of the view when created on the DHIS2 server.  
+Names should be unique across all queries. 
+- description: A description of the query. 
+- section: This field can be used to group related queires in the report. 
+- section_order: This field can be used to order query results within a section. 
+- summary_uid: A UID which will be used to identify the summary query. 
+- summary_sql: Each summary SQL query should return a single line and consist of four columns. 
+    - indicator: Should be the same as the "name" field. 
+    - value: Should be a number which provides the total number of issues.
+    -  percent: Should be a character string consisting of the percentage of 
+ issues compared to the overall possible number of issues. 
+    - description: The same as the description field above. 
+- details_uid: UID for the query which should provide a full list of all issues.
+- details_sql: The SQL for listing all issues, consisting of two columns "uid" and "name"
 
-An example is provided below. 
-
---type: summary
---uid: U5DK7LdyJre
---name: abandoned_dashboards_S
---description: Dashboards with 1 or fewer views over the past three years
---detail_uid: Dfjw69AKQln
-
-
-Note that these are SQL comments, which ensures that the content of each SQL
-file can be easily copy and pasted when using the queires directly 
-with a database. 
-
-A description of each field is provided below. 
-
-- type: Should be either "summary" or "details"
-- uid: A DHIS2 uid used to indentify the query. 
-- name: Should consist of a snake-cased name which provides a succint description
-of the action of the query. The name should end in either "_S" for a summary
-query or "_D" for a details query. 
-- description: A short human readable description of the issue which 
-the query identifies. 
-- detail_uid: Only applicable to summary queries. This should provide the uid
-of the details query which is related to each summary query. 
+Note that all YAML files must be terminated with a final empty line.
