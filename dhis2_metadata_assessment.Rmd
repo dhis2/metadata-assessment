@@ -9,15 +9,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r include=FALSE}
-require(jsonlite)
-require(httr)
-require(purrr)
-require(knitr)
-require(magrittr)
-require(ggplot2)
-require(DT)
-require(dplyr)
 
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(jsonlite, httr, purrr,knitr,magrittr,ggplot2,DT,dplyr,yaml,knitr,rmarkdown,dplyr)
 
 source("R/utils.R")
 #Modify login details to the server as needed
