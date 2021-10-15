@@ -18,65 +18,16 @@ uploadMetadata <- function(payload, d2_session) {
   return(r)
 }
 
-transformSQLtoJSON <- function(filepath) {
-  con = file(filepath, "r")
-  sql.string <- ""
-  
-  sql_views <- list()
-  sql_view <- list()
-  while (TRUE) {
-    line <- readLines(con, n = 1)
-    
-    #We hit the bottom of the file
-    if (length(line) == 0) {
-      sql_view$sqlQuery <-
-        stringr::str_squish(stringr::str_replace_all(sql.string, "[\r\n]" , ""))
-      sql_views <- rlist::list.append(sql_views, sql_view)
-      break
-    }
-    
-    line <- gsub("\\t", " ", line)
-    #Start a new list and append the old one before resetting
-    if (grepl("--type:", line) == TRUE) {
-      if (grepl("details", line) == TRUE) {
-        sql_view$sqlQuery <-
-          stringr::str_squish(stringr::str_replace_all(sql.string, "[\r\n]" , ""))
-        sql_views <- rlist::list.append(sql_views, sql_view)
-      }
-      sql.string = ""
-      sql_view <-
-        list(
-          id = character(),
-          name = character(),
-          description = character(),
-          sqlQuery = character(),
-          type="QUERY",
-          sharing=list(
-            external=FALSE,
-            public="rwr-----"
-          )
-        )
-    }
-    
-    if (grepl("--uid:", line) == TRUE) {
-      sql_view$id <- sub("--uid: ", "", line)
-    }
-    
-    if (grepl("--name:", line) == TRUE) {
-      sql_view$name <- sub("--name: ", "", line)
-    }
-    if (grepl("--description:", line) == TRUE) {
-      sql_view$description <- sub("--description: ", "", line)
-    }
-    if (!grepl("--", line)) {
-      sql.string <- paste(sql.string, line)
-    }
-  }
-  
-  close(con)
-  return(sql_views)
-}
+deleteMetadata <- function(payload, d2_session) {
 
+  url <-paste0(d2_session$url,"api/metadata?importStrategy=DELETE")
+  r <- httr::POST(url = url,
+                  body = jsonlite::toJSON(payload,auto_unbox = TRUE),
+                  content_type_json(),
+                  handle = d2_session)
+
+  return(r)
+}
 
 transformYAMLtoJSON <- function(filepath) {
   r <- yaml::read_yaml(filepath)
@@ -103,7 +54,6 @@ transformYAMLtoJSON <- function(filepath) {
   list(summary_sql,details_sql)
   
 }
-
 
 transformYAMLtoControlFile<-function(file) {
   all_yaml_files<-list.files("yaml/",pattern="*.yaml",recursive = TRUE,full.names = TRUE)

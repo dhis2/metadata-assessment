@@ -56,6 +56,10 @@ results<-purrr::map_dfr(views$summary_uid,function(x) getSQLView(x,d2_session = 
                 "Count" = ,
                 "Percentage" = percent )
 
+#Remove the views if requested to
+if (Sys.getenv("cleanup_views") == TRUE) {
+  r <- deleteMetadata(metadata, d2_session)
+}
 
 DT::datatable(results)
 
