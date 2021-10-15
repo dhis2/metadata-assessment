@@ -116,22 +116,20 @@ getSQLView <- function(uid,d2_session) {
   #   return(data.frame())
   # }
   
-  resp  <- httr::GET(paste0(d2_session$url,"api/sqlViews/",uid,"/data.json"), 
+   httr::GET(paste0(d2_session$url,"api/sqlViews/",uid,"/data.csv"), 
                      handle=d2_session,
                      timeout(600)) %>% 
     httr::content("text") %>% 
-    jsonlite::fromJSON(.)
-  headers <- resp$listGrid$headers$column
-  
-  df <- as.data.frame(resp$listGrid$rows,stringsAsFactors = FALSE)
-  
-  
-  colnames(df) <- headers
-  if ( NROW(df) == 0) {
-    return(NULL) } 
-  
-  df$uid <- uid
-  df
+    { # nolint
+      suppressWarnings(readr::read_csv(
+        .,
+        col_names = TRUE,
+        col_types = readr::cols(
+          .default = "c"
+        )
+      ))
+    } %>% 
+    dplyr::mutate(uid = uid)
   
 }
 

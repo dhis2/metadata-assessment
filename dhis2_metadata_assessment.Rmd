@@ -5,13 +5,13 @@ date: "`r Sys.Date()`"
 ---
   
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r include=FALSE}
 
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(jsonlite, httr, purrr,knitr,magrittr,ggplot2,DT,dplyr,yaml,knitr,rmarkdown,dplyr)
+pacman::p_load(jsonlite, httr, purrr,knitr,magrittr,ggplot2,DT,dplyr,yaml,knitr,rmarkdown,dplyr,readr)
 
 source("R/utils.R")
 #Modify login details to the server as needed
@@ -54,7 +54,7 @@ results<-purrr::map_dfr(views$summary_uid,function(x) getSQLView(x,d2_session = 
   dplyr::mutate("Details" = paste0("<a href='",d2_session$url,"/api/sqlViews/",details_uid,"/data.csv'>Details</a>")) %>% 
   dplyr::select( "Theme" = section,
     "Issue" = description,
-                "Count" = ,
+                "Count" = value,
                 "Percentage" = percent,
     Details)
 #Remove the views if requested to
