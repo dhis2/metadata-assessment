@@ -34,7 +34,7 @@
     select 'indicator_noanalysis' as indicator,
     count(*)::varchar as value, 
     (100*count(*)/(select count(*) from indicator))||'%' as percent, 
-    'Indicators not used in favourites' from indicator 
+    'Indicators not used in favourites' as description from indicator 
     where indicatorid
     not in (select indicatorid from datadimensionitem
     where indicatorid IS NOT NULL);
