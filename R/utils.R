@@ -37,6 +37,7 @@ transformYAMLtoJSON <- function(filepath) {
                       description = r$description,
                       sqlQuery = r$summary_sql,
                       type = "QUERY",
+                      cacheStrategy="NO_CACHE",
                       sharing=list(
                         external=FALSE,
                         public="rwr-----"
@@ -47,6 +48,7 @@ transformYAMLtoJSON <- function(filepath) {
                       description = r$description,
                       sqlQuery = r$details_sql,
                       type = "QUERY",
+                      cacheStrategy="NO_CACHE",
                       sharing=list(
                         external=FALSE,
                         public="rwr-----"
@@ -84,6 +86,7 @@ transformYAMLtoMetadata <- function() {
                        description = r$description[i],
                        sqlQuery = r$summary_sql[i],
                        type = "QUERY",
+                       cacheStrategy="NO_CACHE",
                        sharing=list(
                          external=FALSE,
                          public="rwr-----"
@@ -94,6 +97,7 @@ transformYAMLtoMetadata <- function() {
                        description = r$description[i],
                        sqlQuery = r$details_sql[i],
                        type = "QUERY",
+                       cacheStrategy="NO_CACHE",
                        sharing=list(
                          external=FALSE,
                          public="rwr-----"
