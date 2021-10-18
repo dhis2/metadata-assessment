@@ -116,9 +116,18 @@ getSQLView <- function(uid,d2_session) {
   #   return(data.frame())
   # }
   
-   httr::GET(paste0(d2_session$url,"api/sqlViews/",uid,"/data.csv"), 
+   
+  r <- tryCatch( httr::GET(paste0(d2_session$url,"api/sqlViews/",uid,"/data.csv"), 
                      handle=d2_session,
-                     timeout(600)) %>% 
+                     timeout(600)) ,
+                 error = function(e) print(e) )
+   
+  if (r$status_code != 200L) {
+    print(paste("ERROR! View", uid, "could not be executed on the server"))
+    return(NULL)
+  }
+   
+   r %>% 
     httr::content("text") %>% 
     { # nolint
       suppressWarnings(readr::read_csv(

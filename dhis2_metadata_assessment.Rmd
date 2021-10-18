@@ -54,7 +54,20 @@ if (!me$status_code == 200L) {
 
 summary_views <- views$summary_uid
 
-results<-purrr::map_dfr(views$summary_uid,function(x) getSQLView(x,d2_session = d2_session)) %>% 
+
+results <- data.frame(indicator = character(),
+                      value = character(),
+                      percent = character(),
+                      description = character(),
+                      stringsAsFactors = FALSE)
+
+for (uid in summary_views) {
+  r <- getSQLView(uid,d2_session = d2_session)
+  results <- dplyr::bind_rows(r,results)
+}
+
+
+results<-results %>% 
   dplyr::left_join(views[,c("summary_uid","section","section_order","details_uid")] , by =c("uid"="summary_uid")) %>% 
   dplyr::arrange(section,section_order) %>%
   dplyr::mutate("Details" = paste0("<a href='",d2_session$url,"/api/sqlViews/",details_uid,"/data.csv'>Details</a>")) %>% 
