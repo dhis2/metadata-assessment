@@ -32,7 +32,7 @@
   section_order: 2
   summary_sql: >-
     select 'categories_no_options' as indicator,
-    COUNT(*) as value,
+    COUNT(*)::varchar as value,
     (100 * COUNT(*) / (SELECT COUNT(*) FROM dataelementcategory)) || '%' as percent,
     'Categories without category options' as description
     from dataelementcategory where categoryid
