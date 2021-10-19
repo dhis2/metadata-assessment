@@ -1,0 +1,56 @@
+{
+  "$schema":"http://json-schema.org/draft-04/schema#",
+  "$id": "https://dhis2.org/metadata-asessment.schema.json",
+  "title": "Metadata Asessment",
+  "description": "A DHIS2 metadata asessment object",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "A short and unique name which will represent the name of the set of queries in DHIS2",
+      "type": "string"
+    },
+    "section" : {
+        "description": "A name which can be used to group related queries.",
+        "type" : "string"
+    },
+    "section_order" : {
+        "description": "A number which can be used to order queries within sections",
+        "type": "integer",
+        "minimum": 1
+    },
+    "summary_uid": {
+        "type": "string",
+        "description": "A DHIS2 uid used to identify the summary query"
+    },
+    "summary_sql": {
+        "description": "An SQL query which should return a single line and consist of four character fields: indicator,value,percent and description",
+        "type": "string"
+    },
+    "details_uid":{
+        "description": "A DHIS2 uid used to indentify the details query",
+        "type": "string"
+
+    },
+    "details_sql": {
+        "description": "A DHIS2 database query which should return all indetified objects from this particular issue. Should return at least uid and name"
+    },
+    "severity": {
+        "description": "Level of severity of the issue",
+        "type" : "string",
+        "enum": ["INFO",
+                "WARNING",
+                "SEVERE",
+                "CRITICAL"]
+    },
+    "introduction": {
+        "description": "This should field describe the issue the queries are seeking to idenfity.",
+        "type": "string"
+
+    },
+    "reccomendation": {
+        "description": "This field should describe the procedure to rectify the problems",
+        "type": "string"
+    }
+
+  }
+}
