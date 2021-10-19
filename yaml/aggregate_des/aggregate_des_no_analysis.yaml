@@ -57,3 +57,18 @@
     where dataelementoperand_dataelementid > 0) and dataelementid
     not in (select dataelementid from datadimensionitem where dataelementid > 0)
     order by name;
+  severity: WARNING
+  introduction: >
+    All data elements that are captured in DHIS2 should be used to produce some type of
+    analysis output (charts, maps, tables). This can be by using them directly
+    in an output, or by having them contribute to an indicator calculation
+    that is used an output.
+  recommendation: >
+    Data elements that are not routinely being reviewed in analysis,
+    either directly or indirectly through indicators, should be reviewed
+    to determine if they still need to be collected. If these are meant to be used
+    in routine review, then associated outputs should be created using them. If these
+     data elements are not going to be used for any type of information review,
+     consideration should be made to either archive them or delete them.
+
+

@@ -33,8 +33,8 @@
   summary_sql: >-
     WITH options_sets_unused as (
     SELECT DISTINCT uid,name FROM optionset where optionsetid NOT IN (
-    SELECT DISTINCT optionsetid from attribute where optionsetid IS NOT NULL UNION 
-    SELECT DISTINCT optionsetid from dataelement where optionsetid IS NOT NULL UNION 
+    SELECT DISTINCT optionsetid from attribute where optionsetid IS NOT NULL UNION
+    SELECT DISTINCT optionsetid from dataelement where optionsetid IS NOT NULL UNION
     SELECT DISTINCT commentoptionsetid from dataelement where commentoptionsetid IS NOT NULL
     ))
     SELECT 'options_sets_unused' as indicator,
@@ -45,7 +45,12 @@
   details_uid: i4OtFbZmqkp
   details_sql: >-
     SELECT DISTINCT uid,name FROM optionset where optionsetid NOT IN (
-    SELECT DISTINCT optionsetid from attribute where optionsetid IS NOT NULL UNION 
-    SELECT DISTINCT optionsetid from dataelement where optionsetid IS NOT NULL UNION 
+    SELECT DISTINCT optionsetid from attribute where optionsetid IS NOT NULL UNION
+    SELECT DISTINCT optionsetid from dataelement where optionsetid IS NOT NULL UNION
     SELECT DISTINCT commentoptionsetid from dataelement where commentoptionsetid IS NOT NULL
     ORDER BY name;
+  severity: WARNING
+  introduction: >
+    Option sets should be used for some purpose either with attributes, data elements, or comments.
+  recommendation: >
+    Consider deleting unused option sets, or alternatively, ensure that they have been properly assigned.

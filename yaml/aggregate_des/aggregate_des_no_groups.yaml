@@ -43,3 +43,14 @@
     where domaintype = 'AGGREGATE'
     and dataelementid not in (select dataelementid from dataelementgroupmembers)
     ORDER BY name;
+  severity: WARNING
+  introduction: >
+    All data elements should be in a data element group.
+    This allows users to find the data elements more easily in analysis
+     apps and also contributes to having more complete data element group sets.
+     Maintenance operations can also be made more efficient by applying
+     bulk settings (ex. sharing) to all data elements within a data element group.
+  recommendation: >
+    Data elements that are not in a data element group should be added to a relevant
+    data element group. If the data elements are not needed, they should be deleted.
+

@@ -25,8 +25,8 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ---
-  summary_uid: U5DK7LdyJre
   name: abandoned_dashboards
+  summary_uid: U5DK7LdyJre
   description: Dashboards with 1 or fewer views over the past three years
   section: Dashboards
   section_order: 2
@@ -47,3 +47,14 @@
    and favoriteuid is not null and extract(year from timestamp) >=
    ( extract(year from now()) -3 ) group by favoriteuid having count(*) >1)
    ORDER BY name;
+  severity: WARNING
+  introduction: >
+    Sed vestibulum, vitae. Aliquam tincidunt morbi sit class aenean.
+    Neque sodales vitae donec. Dis, vitae maecenas nec diam aenean, nec, sed.
+    Tincidunt mattis hac in non donec leo dictumst et feugiat commodo, curae.
+    Diam quis ac vestibulum nec lobortis id, in facilisi et felis.
+  recommendation: >
+    Vestibulum quisque vel in dolor in proin,
+    ipsum et urna mauris. Sit lorem dis et hac non feugiat.
+    Mi pulvinar, curae nisi ipsum libero aliquet. Id id.
+    Sed tortor vestibulum tincidunt facilisi elementum mauris euismod, tincidunt.

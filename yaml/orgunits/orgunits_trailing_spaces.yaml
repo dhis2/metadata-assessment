@@ -33,7 +33,7 @@
   summary_sql: >-
     WITH orgunits_trailing_spaces as (
     SELECT uid, name from organisationunit where name ~('\s+$')
-    ) 
+    )
     SELECT 'orgunits_trailing_spaces' as indicator,
     COUNT(*)::varchar as value,
     (100 * COUNT(*) / (SELECT COUNT(*) FROM organisationunit)) || '%' as percent,
@@ -43,3 +43,10 @@
   details_sql: >-
     SELECT uid, name from organisationunit where name ~('\s+$')
     ORDER BY name;
+  severity: WARNING
+  introduction: >
+    Trailing spaces in organisation units are superfluous.
+  recommendation:
+    If the number of affected organisation units is small, the easiest remedy is to correct
+    them directly from the user interface. Another possible option would be to replace
+    all of the multiple spaces using SQL.

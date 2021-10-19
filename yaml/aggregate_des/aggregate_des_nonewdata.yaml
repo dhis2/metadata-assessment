@@ -37,7 +37,7 @@
     left join datasetelement using(datasetid)
     where date_part('day', now() - pe.enddate::timestamp)::int
     <= 3*date_part('day', pe.enddate::timestamp - pe.startdate::timestamp)::int)
-    select 'dataelement_nonewdata' as indicator, 
+    select 'dataelement_nonewdata' as indicator,
     count(*)::varchar as value, (100*count(*)/(select count(*)
     from dataelement where domaintype = 'AGGREGATE' ))::varchar || '%' as percent,
     'Aggregate data elements with no data values in the last 3 periods (based on data set period type).' as description
@@ -57,3 +57,10 @@
     and dataelementid not in (select distinct dataelementid from ds_period
     where (dataelementid,periodid) in (select dataelementid, periodid from datavalue) group by dataelementid)
     ORDER BY name;
+  severity: WARNING
+  introduction: >
+    Data elements that have not been recently updated
+    with data values should consider to be deallocated from datasets.
+    The criteria for inactive data elements  has been defined as data elements
+     with no new values in the last 3 periods based on the data set period type
+     associated with those data elements)

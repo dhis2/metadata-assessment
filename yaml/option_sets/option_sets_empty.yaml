@@ -32,11 +32,11 @@
   section_order: 3
   summary_sql: >-
     WITH options_sets_empty as (
-    SELECT uid,name from 
+    SELECT uid,name from
     optionset where optionsetid
-    NOT IN (SELECT DISTINCT optionsetid 
+    NOT IN (SELECT DISTINCT optionsetid
     from optionvalue WHERE optionsetid IS NOT NULL)
-    ) 
+    )
     SELECT 'options_sets_empty' as indicator,
     COUNT(*)::varchar as value,
     (100 * COUNT(*) / (SELECT COUNT(*) FROM optionset)) || '%' as percent,
@@ -44,8 +44,13 @@
     from options_sets_empty;
   details_uid: wjIQ26nrXT8
   details_sql: >-
-    SELECT uid,name from 
+    SELECT uid,name from
     optionset where optionsetid
-    NOT IN (SELECT DISTINCT optionsetid 
+    NOT IN (SELECT DISTINCT optionsetid
     from optionvalue WHERE optionsetid IS NOT NULL)
     ORDER BY name;
+  severity: WARNING
+  introduction: >
+    All option sets should generally include at least two items. Empty option sets serve no purpose.
+  recommendation: >
+    Options should either be added to the option set, or the option set should be deleted.

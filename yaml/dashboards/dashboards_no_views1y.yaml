@@ -48,4 +48,15 @@
     'DASHBOARD_VIEW' and favoriteuid is not null
      and timestamp > (now() - INTERVAL '12 months')
      GROUP BY favoriteuid);
-
+  severity: WARNING
+  introduction: >
+    All dashboards should be reviewed routinely.
+    Dashboards that are no longer viewed routinely are not being used, or potentially being used incorrectly.
+    The definition of "routine" may vary
+    between implementations and therefore you can assess this over both the
+    last 12 months as well as a pre-defined period of your choosing.
+  recommendation: >
+    Dashboards that should be reviewed routinely and are not point
+    to a broader data use issue that will not be addressed by technical means.
+    Such dashboards may need to be kept while a process for reviewing
+    them more frequently becomes more well defined.

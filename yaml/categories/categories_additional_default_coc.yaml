@@ -27,26 +27,34 @@
 ---
   summary_uid: ExQnod9cFgj
   name: categories_additional_default_coc
-  description: Additional default category option combos based on category option. 
+  description: Additional default category option combos based on category option.
   section: Categories
   section_order: 3
   summary_sql: >-
-   WITH categories_additional_default_coc  AS (
-   select coc.categoryoptioncomboid, coc.uid from categoryoptioncombo coc 
-   inner join categoryoptioncombos_categoryoptions 
-   cocco on coc.categoryoptioncomboid=cocco.categoryoptioncomboid 
-   inner join dataelementcategoryoption co on 
-   cocco.categoryoptionid=co.categoryoptionid where co.name = 'default' offset 1
-   )
-   SELECT 'categories_additional_default_coc' as indicator,
-   COUNT(*)::varchar as value,
-   (100 * COUNT(*) / (SELECT COUNT(*) FROM categoryoptioncombo)) || '%' as percent,
-   'Additional default category option combos based on category option.' as description
-   FROM categories_additional_default_coc;
+    WITH categories_additional_default_coc  AS (
+    select coc.categoryoptioncomboid, coc.uid from categoryoptioncombo coc
+    inner join categoryoptioncombos_categoryoptions
+    cocco on coc.categoryoptioncomboid=cocco.categoryoptioncomboid
+    inner join dataelementcategoryoption co on
+    cocco.categoryoptionid=co.categoryoptionid where co.name = 'default' offset 1
+    )
+    SELECT 'categories_additional_default_coc' as indicator,
+    COUNT(*)::varchar as value,
+    (100 * COUNT(*) / (SELECT COUNT(*) FROM categoryoptioncombo)) || '%' as percent,
+    'Additional default category option combos based on category option.' as description
+    FROM categories_additional_default_coc;
   details_uid: dymvZMsbw9D
   details_sql: >-
-   select  coc.uid, coc.name from categoryoptioncombo coc 
-   inner join categoryoptioncombos_categoryoptions 
-   cocco on coc.categoryoptioncomboid=cocco.categoryoptioncomboid 
-   inner join dataelementcategoryoption co on 
-   cocco.categoryoptionid=co.categoryoptionid where co.name = 'default' offset 1;
+    select  coc.uid, coc.name from categoryoptioncombo coc
+     inner join categoryoptioncombos_categoryoptions
+     cocco on coc.categoryoptioncomboid=cocco.categoryoptioncomboid
+     inner join dataelementcategoryoption co on
+     cocco.categoryoptionid=co.categoryoptionid where co.name = 'default' offset 1;
+  severity: CRITICAL
+  introduction: >
+    There should only be a single 'default' category option combination in the system.
+    Having multiple default category option combinations may lead to irregularties in
+    both data entry as well as analytical outputs.
+  recommendation: >
+    All references to the additional default category option combination should be replaced
+    with the desired default category option combination.

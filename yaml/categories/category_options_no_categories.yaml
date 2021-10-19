@@ -32,22 +32,28 @@
   section_order: 3
   summary_sql: >-
     WITH category_options_no_categories  AS (
-    SELECT uid,name FROM dataelementcategoryoption 
+    SELECT uid,name FROM dataelementcategoryoption
     WHERE categoryoptionid
     NOT IN
-    (SELECT DISTINCT categoryoptionid 
+    (SELECT DISTINCT categoryoptionid
     FROM categories_categoryoptions))
     SELECT 'category_options_no_categories' as indicator,
     COUNT(*)::varchar as value,
-    ROUND( 100.0 * COUNT(*) / (SELECT COUNT(*) 
+    ROUND( 100.0 * COUNT(*) / (SELECT COUNT(*)
     FROM dataelementcategoryoption) ) || '%' as percent,
     'Category options with no categories' as description
     FROM category_options_no_categories;
   details_uid: Fp9jUG2txCV
   details_sql: >-
-    SELECT uid,name FROM dataelementcategoryoption 
+    SELECT uid,name FROM dataelementcategoryoption
     WHERE categoryoptionid
     NOT IN
-    (SELECT DISTINCT categoryoptionid 
+    (SELECT DISTINCT categoryoptionid
     FROM categories_categoryoptions)
     ORDER BY name;
+  severity: WARNING
+  introduction: >
+    All category options should belong to at least one category.
+  recommendation: >
+    Category options which are not part of any category should be removed
+    or alternatively should be added to an appropriate category.

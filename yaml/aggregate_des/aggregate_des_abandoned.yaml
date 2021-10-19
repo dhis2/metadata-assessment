@@ -46,3 +46,18 @@
     not in (select dataelementid from datavalue group by dataelementid)
     and date_part('day', now() - lastupdated::date) > 100
     ORDER BY name;
+  severity: WARNING
+  introduction: >
+    * Data elements that should have recent data values but do not
+    should be reviewed to determine if the program intends to keep
+    reporting on them; if not these should be removed from the dataset
+    or program they are associated with.
+
+    * "Abandoned" data elements. These are data elements that have not
+     been updated in at least 100 days and do not have any data values
+     associated with them.
+  recommendation: >
+    Data elements which are no longer being reported on should be removed
+    from datasets.
+
+

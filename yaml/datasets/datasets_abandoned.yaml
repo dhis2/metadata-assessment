@@ -46,3 +46,11 @@
      (datasetid not in (select datasetid from datasetsource)
      or datasetid in (select datasetid from datasetsource group by datasetid having count(*) = 1))
      ORDER BY name;
+  severity: WARNING
+  introduction: >
+     Datasets should generally be assigned to multiple organisation units, and should have been used
+     recently (e.g. 100 days). Unused datasets may increase the response time of the data entry
+     app. Users may also by mistake enter data into inactive datasets.
+  recommendation: >
+     Datasets which are not active should be removed from the system to decrease system clutter
+     and metadata size.

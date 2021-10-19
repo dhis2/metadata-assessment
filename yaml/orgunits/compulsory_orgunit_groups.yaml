@@ -31,28 +31,37 @@
   section: Organisation units
   section_order: 2
   summary_sql: >-
-    with orgunit_compulsory_group_count as (select organisationunitid 
+    with orgunit_compulsory_group_count as (select organisationunitid
     as orgunitid,count(ogs.orgunitgroupsetid) as actual,
     (select count(*) as expected from orgunitgroupset where compulsory = true)
-    from orgunitgroupsetmembers ogsm 
-    left join orgunitgroupset ogs using(orgunitgroupsetid) 
-    left join orgunitgroupmembers ogm using(orgunitgroupid) 
-    where ogs.compulsory = true group by ogm.organisationunitid) 
-    select 'orgunit_notincompulsory' as indicator, 
-    count(*)::varchar as value, 
-    (100*count(*)/(select count(*) from organisationunit))||'%' as percent, 
+    from orgunitgroupsetmembers ogsm
+    left join orgunitgroupset ogs using(orgunitgroupsetid)
+    left join orgunitgroupmembers ogm using(orgunitgroupid)
+    where ogs.compulsory = true group by ogm.organisationunitid)
+    select 'orgunit_notincompulsory' as indicator,
+    count(*)::varchar as value,
+    (100*count(*)/(select count(*) from organisationunit))||'%' as percent,
     'Orgunits that are not in all compulsory orgunit group sets' as description
     from orgunit_compulsory_group_count where actual != expected;
   details_uid: HnmKIwXFWy5
   details_sql: >-
-    with orgunit_compulsory_group_count as (select organisationunitid 
+    with orgunit_compulsory_group_count as (select organisationunitid
     as orgunitid,count(ogs.orgunitgroupsetid) as actual,
     (select count(*) as expected from orgunitgroupset where compulsory = true)
-    from orgunitgroupsetmembers ogsm 
-    left join orgunitgroupset ogs using(orgunitgroupsetid) 
-    left join orgunitgroupmembers ogm using(orgunitgroupid) 
-    where ogs.compulsory = true group by ogm.organisationunitid) 
+    from orgunitgroupsetmembers ogsm
+    left join orgunitgroupset ogs using(orgunitgroupsetid)
+    left join orgunitgroupmembers ogm using(orgunitgroupid)
+    where ogs.compulsory = true group by ogm.organisationunitid)
     SELECT uid,name from organisationunit
-    where organisationunitid NOT IN (SELECT organisationunitid 
+    where organisationunitid NOT IN (SELECT organisationunitid
     from orgunit_compulsory_group_count)
     ORDER BY name;
+  severity: SEVERE
+  introduction: >
+    Any organisation unit groups which have been marked as compulsory should
+    contain all organization units in the system. If certain organization units
+    are omitted from the groups in the group set, this may cause irregularities
+    in analytical outputs, such as data being omitted.
+  recommendation: >
+    Add all organization units to exactly one group within a compulsory organization unit
+    group.

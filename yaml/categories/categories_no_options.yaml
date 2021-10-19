@@ -43,3 +43,10 @@
     where categoryid
     not in (select distinct categoryid from categories_categoryoptions)
     ORDER BY name;
+  severity: WARNING
+  introduction: >
+    Categories should always have at least a single category options.
+  recommendation: >
+    Any categories without category options should either be removed from the
+    system if they are not in use. Otherwise, appropriate category options
+    should be added to the category.

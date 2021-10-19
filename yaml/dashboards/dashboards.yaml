@@ -41,3 +41,6 @@
     select uid,name
     from dashboard
     LIMIT 1000;
+  severity: INFO
+  introduction: Total number of dashboards in the system.
+  recommendation: DHIS2 should contain useful dashboards for users.

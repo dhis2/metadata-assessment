@@ -40,3 +40,11 @@
   details_sql: >-
        SELECT uid,name from dashboard WHERE
        dashboardid not in (select dashboardid from dashboard_items);
+  severity: INFO
+  introduction: >
+    All dashboards should have content on them.
+    Dashboards without any content do not serve any purpose,
+    and may have been created by accident or as part of a training exercise.
+  recommendation: >
+    Dashboards without content that have not
+    been modified in the last 14 days can be removed.

@@ -32,16 +32,16 @@
   summary_uid: hN9QvyXRdQC
   summary_sql: >
      WITH des_no_orgunits AS (
-     select uid,name from dataelement 
+     select uid,name from dataelement
      where (dataelementid not in (select dataelementid from datasetelement))
      AND domaintype = 'AGGREGATE'
      or (dataelementid in
-     (select dataelementid from datasetelement 
-     where datasetid 
+     (select dataelementid from datasetelement
+     where datasetid
      not in (select datasetid from datasetsource))
      or  (dataelementid in (select dataelementid from dataelement de
      left join datasetelement dse using (dataelementid)
-     left join datasetsource dss using (datasetid) 
+     left join datasetsource dss using (datasetid)
      WHERE de.domaintype = 'AGGREGATE'
      group by dataelementid having count(dss.*) = 1))) order by name
      )
@@ -52,14 +52,21 @@
      FROM des_no_orgunits;
   details_uid: xdx9XquVi30
   details_sql: >
-    select uid,name from dataelement 
+    select uid,name from dataelement
     where (dataelementid not in (select dataelementid from datasetelement))
     AND domaintype = 'AGGREGATE'
     or (dataelementid in
-    (select dataelementid from datasetelement where datasetid 
+    (select dataelementid from datasetelement where datasetid
     not in (select datasetid from datasetsource))
     or  (dataelementid in (select dataelementid from dataelement de
     left join datasetelement dse using (dataelementid)
-    left join datasetsource dss using (datasetid) 
+    left join datasetsource dss using (datasetid)
     WHERE de.domaintype = 'AGGREGATE'
     group by dataelementid having count(dss.*) = 1))) order by name;
+  severity: WARNING
+  introduction: >
+    Data elements which are part of an aggregate dataset should be assigned
+    to at least one organisation unit.
+  recommendation: >
+    If the dataset is active, then review the organisation unit assignments.
+    If the dataset is not active, then it should be removed from the system.

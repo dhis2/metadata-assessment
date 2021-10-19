@@ -33,7 +33,8 @@
   summary_sql: >-
     select 'aggregate_des_nodata' as indicator,
     count(*)::varchar as value ,
-    (100*count(*)/(select count(*) from dataelement where domaintype = 'AGGREGATE'))||'%' as percent,
+    (100*count(*)/(select count(*) from dataelement
+    where domaintype = 'AGGREGATE'))||'%' as percent,
     'Aggregate data elements with NO data values' as description
     from dataelement where domaintype = 'AGGREGATE'
     and dataelementid not in (select DISTINCT dataelementid from datavalue);
@@ -43,3 +44,12 @@
     where domaintype = 'AGGREGATE'
     and dataelementid not in (select DISTINCT dataelementid from datavalue)
     ORDER BY name;
+  severity: WARNING
+  introduction: >
+    Data elements should generally always be associated with data values.
+    If data elements exist in a data set which is active, but there are no
+    data values associated with them, they may not be part of the data entry
+    screens. Another possibility is that they simply do have have any data
+    at all, because they are unable to be reported on.
+  recommendation: >
+    Consider removing data elements with no data values.

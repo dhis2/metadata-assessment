@@ -32,12 +32,15 @@
   summary_uid: UZImRtUF3QC
   summary_sql: >-
     select 'indicator_count' as indicator,
-    count(*)::varchar as value, 
+    count(*)::varchar as value,
     '100%' as percent,
     'Total count of indicators' as description
     from indicator;
   details_uid: IY6j3BNM2nG
   details_sql: >-
-    SELECT uid,name 
+    SELECT uid,name
     FROM indicator
     ORDER BY name;
+  severity: INFO
+  introduction: Overview of the number of indicators in the system.
+  recommendation: DHIS2 should contain useful indicators for users.

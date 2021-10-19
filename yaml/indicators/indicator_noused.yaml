@@ -25,26 +25,38 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ---
-  name: indicator_noused
-  description: Indicators not used in favourites OR data sets
+  name: indicator_nouse
+  description: Indicators not used in analytical objects OR data sets
   section: Indicators
   section_order: 3
   summary_uid: CeFBSNslp7V
   summary_sql: >-
     select 'indicator_nouse' as indicator,
-    count(*)::varchar as value, 
-    (100*count(*)/(select count(*) from indicator))||'%'  as percent, 
+    count(*)::varchar as value,
+    (100*count(*)/(select count(*) from indicator))||'%'  as percent,
     'Indicators not used in favourites OR data sets' as description from indicator
-    where indicatorid not in 
-    (select indicatorid from datadimensionitem where indicatorid IS NOT NULL) and 
+    where indicatorid not in
+    (select indicatorid from datadimensionitem where indicatorid IS NOT NULL) and
     indicatorid not in (select indicatorid from datasetindicators);
   details_uid: wnQsTWqfpdV
   details_sql: >-
-    SELECT uid,name 
+    SELECT uid,name
     FROM indicator
-    where indicatorid not in 
+    where indicatorid not in
     (select indicatorid from datadimensionitem
-    where indicatorid not in 
-    (select indicatorid from datadimensionitem where indicatorid IS NOT NULL) and 
+    where indicatorid not in
+    (select indicatorid from datadimensionitem where indicatorid IS NOT NULL) and
     indicatorid not in (select indicatorid from datasetindicators)
     ORDER BY name;
+  severity: WARNING
+  introduction: >
+    All indicators that are calculated should be used to produce some type of analysis output (charts, maps, tables).
+    This can be by using them directly in an output or providing direct feedback in a dataset.
+  recommendation: >
+    Indicators that are not routinely being reviewed in analysis,
+    either in an output or data set, should be reviewed to determine
+    if they still need to be calculated.
+    If these are meant to be used for routine review, then associated outputs should be created using them.
+    If these indicators are
+    not going to be used for any type of information review,
+    consideration should be made to either archive them or delete them.

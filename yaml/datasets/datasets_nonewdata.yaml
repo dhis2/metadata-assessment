@@ -31,41 +31,55 @@
   section: Datasets
   section_order: 3
   summary_sql: >-
-    with ds_lastupdate as (select datasetid, avg(date_part('day', 
-    pe.enddate::timestamp - pe.startdate::timestamp))::int as interval 
-    from dataset ds 
-    left join period pe using(periodtypeid) group by datasetid), 
-    ds_period as (select datasetid, dataelementid, periodid from dataset ds 
-    left join period pe using(periodtypeid) 
-    left join datasetelement using(datasetid) 
-    where date_part('day', now() - 
-    pe.enddate::timestamp)::int <= 3*date_part('day', 
+    with ds_lastupdate as (select datasetid, avg(date_part('day',
+    pe.enddate::timestamp - pe.startdate::timestamp))::int as interval
+    from dataset ds
+    left join period pe using(periodtypeid) group by datasetid),
+    ds_period as (select datasetid, dataelementid, periodid from dataset ds
+    left join period pe using(periodtypeid)
+    left join datasetelement using(datasetid)
+    where date_part('day', now() -
+    pe.enddate::timestamp)::int <= 3*date_part('day',
     pe.enddate::timestamp - pe.startdate::timestamp)::int)
-    select 'dataset_nonewdata' as indicator, 
-    count(*)::varchar as value, 
-    (100*count(*)/(select count(*) from dataset))::varchar || '%' as percent, 
-    'Data sets with no data values in 
+    select 'dataset_nonewdata' as indicator,
+    count(*)::varchar as value,
+    (100*count(*)/(select count(*) from dataset))::varchar || '%' as percent,
+    'Data sets with no data values in
     the last 3 periods (based on data set period type).' as description
-    from dataset 
-    where datasetid not in 
-    (select distinct datasetid from ds_period 
-    where (dataelementid,periodid) in (select dataelementid, 
+    from dataset
+    where datasetid not in
+    (select distinct datasetid from ds_period
+    where (dataelementid,periodid) in (select dataelementid,
     periodid from datavalue) group by datasetid);
-
   details_uid: N4z01NXIcir
   details_sql: >-
-    with ds_lastupdate as (select datasetid, avg(date_part('day', 
-    pe.enddate::timestamp - pe.startdate::timestamp))::int as interval 
-    from dataset ds 
-    left join period pe using(periodtypeid) group by datasetid), 
-    ds_period as (select datasetid, dataelementid, periodid from dataset ds 
-    left join period pe using(periodtypeid) 
-    left join datasetelement using(datasetid) 
-    where date_part('day', now() - 
-    pe.enddate::timestamp)::int <= 3*date_part('day', 
+    with ds_lastupdate as (select datasetid, avg(date_part('day',
+    pe.enddate::timestamp - pe.startdate::timestamp))::int as interval
+    from dataset ds
+    left join period pe using(periodtypeid) group by datasetid),
+    ds_period as (select datasetid, dataelementid, periodid from dataset ds
+    left join period pe using(periodtypeid)
+    left join datasetelement using(datasetid)
+    where date_part('day', now() -
+    pe.enddate::timestamp)::int <= 3*date_part('day',
     pe.enddate::timestamp - pe.startdate::timestamp)::int)
     SELECT uid,name from dataset
-    where datasetid not in 
-    (select distinct datasetid from ds_period 
-    where (dataelementid,periodid) in (select dataelementid, 
+    where datasetid not in
+    (select distinct datasetid from ds_period
+    where (dataelementid,periodid) in (select dataelementid,
     periodid from datavalue) group by datasetid);
+  severity: WARNING
+  introduction: >
+    All active datasets should have data values associated with them.
+    Active data sets are data sets which should be currently used
+    (this is defined as within the last 3 reporting periods) to collect data.
+  recommendation: >
+    * If a data set is not being updated with new data or no new data values
+    are being entered within the last 3 periods (relative to the period type
+    assigned to the dataset ex. monthly will be the last 3 months, quarterly the last 3 quarters)
+    against the dataset but there are data values from previous periods the data set
+    should be archived (ie. assign it a prefix)
+
+    * If a data set has no new or previous data values within the last 3
+    periods (relative to the period type assigned to the dataset) and will
+    not be used to collect data, the data set should be removed.
