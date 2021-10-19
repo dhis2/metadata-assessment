@@ -1,8 +1,8 @@
 {
   "$schema":"http://json-schema.org/draft-04/schema#",
-  "$id": "https://dhis2.org/metadata-asessment.schema.json",
+  "$id": "https://dhis2.org/metadata-assessment.schema.json",
   "title": "Metadata Asessment",
-  "description": "A DHIS2 metadata asessment object",
+  "description": "A DHIS2 metadata assessment object",
   "type": "object",
   "properties": {
     "name": {
