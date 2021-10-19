@@ -1,7 +1,7 @@
 {
   "$schema":"http://json-schema.org/draft-04/schema#",
   "$id": "https://dhis2.org/metadata-assessment.schema.json",
-  "title": "Metadata Asessment",
+  "title": "Metadata Assessment",
   "description": "A DHIS2 metadata assessment object",
   "type": "object",
   "properties": {
@@ -27,12 +27,12 @@
         "type": "string"
     },
     "details_uid":{
-        "description": "A DHIS2 uid used to indentify the details query",
+        "description": "A DHIS2 uid used to identify the details query",
         "type": "string"
 
     },
     "details_sql": {
-        "description": "A DHIS2 database query which should return all indetified objects from this particular issue. Should return at least uid and name"
+        "description": "A DHIS2 database query which should return all identified objects from this particular issue. Should return at least uid and name"
     },
     "severity": {
         "description": "Level of severity of the issue",
@@ -43,11 +43,11 @@
                 "CRITICAL"]
     },
     "introduction": {
-        "description": "This should field describe the issue the queries are seeking to idenfity.",
+        "description": "This should field describe the issue the queries are seeking to identify.",
         "type": "string"
 
     },
-    "reccomendation": {
+    "recommendation": {
         "description": "This field should describe the procedure to rectify the problems",
         "type": "string"
     }
@@ -63,6 +63,6 @@
     "details_sql",
     "severity",
     "introduction",
-    "reccomendation"
+    "recommendation"
 ]
 }
