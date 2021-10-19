@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = FALSE)
 ```{r include=FALSE}
 
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load(jsonlite, httr, purrr,knitr,magrittr,ggplot2,DT,dplyr,yaml,knitr,rmarkdown,dplyr,readr)
+pacman::p_load(jsonlite, httr, purrr,knitr,magrittr,dplyr,yaml,knitr,rmarkdown,stringi)
 
 source("R/utils.R")
 
