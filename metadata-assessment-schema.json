@@ -60,7 +60,7 @@
     "summary_uid",
     "summary_sql",
     "details_uid",
-    "detail_sql",
+    "details_sql",
     "severity",
     "introduction",
     "reccomendation"
