@@ -52,5 +52,17 @@
         "type": "string"
     }
 
-  }
+  },
+"required": [
+    "name",
+    "section",
+    "section_order",
+    "summary_uid",
+    "summary_sql",
+    "details_uid",
+    "detail_sql",
+    "severity",
+    "introduction",
+    "reccomendation"
+]
 }
