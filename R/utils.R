@@ -31,7 +31,7 @@ deleteMetadata <- function(payload, d2_session) {
 
 transformYAMLtoJSON <- function(filepath) {
   r <- yaml::read_yaml(filepath)
-  
+
   summary_sql <- list(id = r$summary_uid,
                       name = paste0(r$name,"_S"),
                       description = r$description,
@@ -54,31 +54,39 @@ transformYAMLtoJSON <- function(filepath) {
                         public="rwr-----"
                       ))
   list(summary_sql,details_sql)
-  
+
 }
 
-transformYAMLtoControlFile<-function(file) {
+transformYAMLtoControlFile<-function(include_protected = FALSE) {
   all_yaml_files<-list.files("yaml/",pattern="*.yaml",recursive = TRUE,full.names = TRUE)
-  d <- purrr::map_dfr(all_yaml_files, yaml::read_yaml) %>% 
+
+  d <- purrr::map_dfr(all_yaml_files, yaml::read_yaml) %>%
+    dplyr::mutate(is_protected = dplyr::case_when(is.na(is_protected) ~ FALSE,
+    TRUE ~ is_protected))  %>%
     dplyr::arrange(section,section_order)
-  
-  dups <-  d %>% dplyr::select(name,description,summary_uid,details_uid) %>% 
-    dplyr::mutate_all(function(x) duplicated(x)) %>% 
-    mutate(has_duplicate = rowSums(across(where(is.logical))) > 0) %>% 
+
+  dups <-  d %>% dplyr::select(name,description,summary_uid,details_uid) %>%
+    dplyr::mutate_all(function(x) duplicated(x)) %>%
+    mutate(has_duplicate = rowSums(across(where(is.logical))) > 0) %>%
     dplyr::pull(has_duplicate)
-  
+
   if (any(dups)) {
     dups <- d %>% dplyr::filter(dups)
     print(dups)
     stop("Duplicates found!")
   }
-  
+
+#Filter any protected tables
+ if (!include_protected) {
+   d <- d  %>% dplyr::filter(!is_protected)
+ }
+
   return(d)
 }
 
-transformYAMLtoMetadata <- function() {
- r <- transformYAMLtoControlFile()
- 
+transformYAMLtoMetadata <- function(include_protected=FALSE) {
+ r <- transformYAMLtoControlFile(include_protected)
+
  sql_views <- list()
  for (i in seq_len(NROW(r))) {
    summary_sql <- list(id = r$summary_uid[i],
@@ -91,7 +99,7 @@ transformYAMLtoMetadata <- function() {
                          external=FALSE,
                          public="rwr-----"
                        ))
-   
+
    details_sql <- list(id = r$details_uid[i],
                        name = paste0(r$name[i],"_D"),
                        description = r$description[i],
@@ -151,4 +159,7 @@ getDetailsUID <- function(name,views) {
   dplyr::filter(views,name == new_name) %>% 
     dplyr::pull(id)
 }
+
+
+
 
