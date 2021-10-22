@@ -1,0 +1,61 @@
+# Copyright (c) 2021, University of Oslo
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# Redistributions of source code must retain the above copyright notice, this
+# list of conditions and the following disclaimer.
+#
+# Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+# Neither the name of the HISP project nor the names of its contributors may
+# be used to endorse or promote products derived from this software without
+# specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+# ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+---
+  summary_uid: ezQJxORagqI
+  name: orgunit_multiple_roots
+  description: The organisation unit hierarchy should have a single root.
+  section: Organisation units
+  section_order: 8
+  summary_sql: >-
+    WITH orgunit_multiple_roots as (
+    SELECT uid,name from organisationunit
+    WHERE parentid IS NULL
+    OFFSET 1 )
+    SELECT 'orgunit_multiple_roots' as indicator,
+    COUNT(*)::varchar as value,
+    ROUND( 100.0 * COUNT(*) / ( SELECT COUNT(*) FROM organisationunit where parentid IS NULL)) || '%' as percent,
+    'Organisation hierarchy should have a single root' as description
+    FROM orgunit_multiple_roots;
+  details_uid: CVy8mwGN6Ec
+  details_sql: >-
+    SELECT uid,name
+    FROM organisationunit where parentid IS NULL
+    ORDER BY name
+  severity: CRITICAL
+  introduction: >
+    Donec mauris interdum sed eget odio.
+    Quisque eget curabitur tellus, quis diam at phasellus vel.
+    Leo amet, a sit pharetra sed varius. Diam tincidunt ex elementum vehicula
+    justo lorem lorem maecenas, pellentesque.
+  recommendation:
+    Vel nec fringilla diam conubia conubia et ipsum nec.
+    Condimentum per elementum et urna diam mauris et.
+    Massa at enim eu a justo ut a dui in. Magna cubilia, enim
+    dui justo netus maximus lobortis ut enim donec feugiat.
+    Tristique eu laoreet non eros eleifend mi, metus morbi natoque volutpat sociosqu.
+    At fermentum ut quis, pulvinar ac duis. Laoreet tempor natoque sociis
+    porta nunc turpis ante sed.

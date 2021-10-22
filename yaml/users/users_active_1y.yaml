@@ -25,22 +25,24 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ---
-  summary_uid: a9SjxgRbZOl
-  name: user_active
-  description: Users should log in routinely
+  summary_uid: lDNPXg3WiJn
+  name: user_inactive_1y
+  description: Users who have not logged in over the past year
   section: Users
-  section_order: 2
+  section_order: 3
   summary_sql: >-
-    select 'user_active' as indicator,
+    SELECT 'user_inactive_1y' as indicator,
     count(*)::varchar as value,
-    (100*count(*)/(select count(*) from users)) || '%' as percent,
-    'Users logged in during last 30 days' as description
-    from users where AGE( now(), lastlogin::date) <= '30 days'::interval;
-  details_uid: OUZfVRTgoJH
+    (100*count(*)/(select count(*) from users WHERE disabled = FALSE)) || '%' as percent,
+    'Users who have not logged in over the past year' as description
+    from users WHERE AGE( now(), lastlogin::date) >= '1 year'::interval
+    AND disabled = FALSE;
+  details_uid: G5u98c3WKsb
   details_sql: >-
-    SELECT username,disabled
-    from users;
-  severity: INFO
+    SELECT username,AGE( now(), lastlogin::date)
+    from users WHERE AGE( now(), lastlogin::date) >= '1 year'::interval
+    AND disabled = FALSE;
+  severity: WARNING
   introduction: >
     All users should log in routinely. The definition of "routine" may vary between
     implementations and therefore you can assess this
