@@ -66,13 +66,16 @@ transformYAMLtoControlFile<-function(include_protected = FALSE) {
     dplyr::arrange(section,section_order)
 
   dups <-  d %>% dplyr::select(name,description,summary_uid,details_uid) %>%
-    dplyr::mutate_all(function(x) duplicated(x)) %>%
-    mutate(has_duplicate = rowSums(across(where(is.logical))) > 0) %>%
-    dplyr::pull(has_duplicate)
-
-  if (any(dups)) {
-    dups <- d %>% dplyr::filter(dups)
-    print(dups)
+    dplyr::mutate_all(function(x) duplicated(x)) %>% 
+    dplyr::mutate(has = rowSums(.) > 0) %>% 
+    purrr::set_names(paste0(names(.),"_dup"))
+  
+  if ( any(dups) ) {
+    duplicates <- d %>%
+      dplyr::select(name,description,summary_uid,details_uid) %>% 
+      dplyr::bind_cols(dups) %>% 
+      dplyr::filter(has_dup > 0)
+    print(duplicates)
     stop("Duplicates found!")
   }
 

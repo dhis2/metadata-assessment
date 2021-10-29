@@ -67,12 +67,22 @@ for (uid in summary_views) {
 }
 
 
-results<-results %>% 
-  dplyr::left_join(views[,c("summary_uid","section","section_order","details_uid")] , by =c("uid"="summary_uid")) %>% 
+results_table <- results %>% 
+  dplyr::left_join(views[,c("summary_uid","section","section_order","details_uid","severity")] , by =c("uid"="summary_uid")) %>% 
   dplyr::arrange(section,section_order) %>%
-  dplyr::mutate("Details" = paste0("<a href='",d2_session$url,"api/sqlViews/",details_uid,"/data.csv'>Details</a>")) %>% 
+  dplyr::mutate(
+    "Details" = paste0(
+      "<a href='",
+      d2_session$url,
+      "api/sqlViews/",
+      details_uid,
+      "/data.csv' target='_blank'>Details</a>"
+    ),
+    severity = stringr::str_to_title(severity)
+  ) %>% 
   dplyr::select( "Theme" = section,
     "Issue" = description,
+    "Level" = severity,
                 "Count" = value,
                 "Percentage" = percent,
     Details)
@@ -81,7 +91,7 @@ if (Sys.getenv("cleanup_views") == TRUE) {
   r <- deleteMetadata(metadata, d2_session)
 }
 
-DT::datatable(results,escape = FALSE)
+DT::datatable(results_table,escape = FALSE)
 
 ```
 
@@ -89,25 +99,34 @@ DT::datatable(results,escape = FALSE)
 
 ```{r users, echo=FALSE,message=FALSE}
 
-url <- paste0(d2_session$url,"api/users?paging=false&fields=userCredentials[*]")
+url <- paste0(d2_session$url,"api/users?paging=false&fields=id,organisationUnits[level],userCredentials[userRoles[authorities],lastLogin,disabled]")
 r <-httr::GET(url,content_type_json(),handle=d2_session) %>% 
   httr::content(.,"text") %>% 
   jsonlite::fromJSON()
 
-n_users <- length(r$users$userCredentials)
+n_users <-  length(r$users$id)
 last_logins <- strptime(r$users$userCredentials$lastLogin,"%Y-%m-%dT%H:%M:%S") 
 last_login_age <- difftime(Sys.time(),last_logins,units="days")
+user_disabled <- r$users$userCredentials$disabled
+user_levels <- r$users$organisationUnits
+users_roles <- r$users$userCredentials$userRoles
+user_has_super <- unlist(lapply(lapply(users_roles, function(x) stringr::str_detect(unlist(x),"^ALL$")),any))
+
 
 ```
 
-- Total users: `r NROW(r$users$userCredentials)`
+- Total users: `r NROW(r$users$userCredentials)` 
+- Total disabled users: `r sum(r$users$userCredentials$disabled,na.rm=TRUE)`
 - Total users logged in within 7 days: `r sum(last_login_age <= 7,na.rm = TRUE)`
 - Total users logged in within 30 days: `r sum(last_login_age <= 30,na.rm = TRUE)`
 - Total users logged in within 90 days: `r sum(last_login_age <= 90,na.rm = TRUE)`
 - Total users logged in within a year: `r sum(last_login_age <= 365,na.rm = TRUE)`
 - Users who have never logged in: `r sum(is.na(last_login_age))`
+- Percentage of users who are disabled: `r round(sum(user_disabled)/length(user_disabled) * 100.0)` %
+- Number of users who have superuser: `r sum(user_has_super)`
+- Percentage of users who have superuser: `r round( sum(user_has_super)/ n_users * 100.0)` %
 
-
+### Distribution of last user logins
 
 ```{r users_histogram,  echo=FALSE,message=FALSE, warning=FALSE}
 
@@ -116,5 +135,69 @@ geom="histogram",
 main="User login age by day",
 xlab="Days since last logged in",
 ylab="Count")
+
+```
+
+### Distribution of users within the hierarchy
+
+```{r users_hierarchy_level,  echo=FALSE,message=FALSE, warning=FALSE}
+
+qplot(unlist(user_levels)[!user_disabled], 
+geom="histogram",
+main="Users hierarchy level",
+xlab="Hierarchy level",
+ylab="Count")
+
+```
+
+
+## Guidance section
+
+This section of the report contains guidance information which provide more context
+and expiation of each of the checks. 
+
+
+```{r guidance, echo=FALSE,message=FALSE,results="asis"}
+
+
+guidance <- results %>% 
+  dplyr::left_join(views[,c("summary_uid","section","section_order","details_uid","severity","introduction","recommendation")] , by =c("uid"="summary_uid")) %>% 
+  dplyr::arrange(section,section_order) %>%
+  dplyr::mutate(details = paste0("<a href='",
+                                 d2_session$url,
+                                 "api/sqlViews/",
+                                 details_uid,
+                                 "/data.csv' target='_blank'>Details</a>"),
+                severity = stringr::str_to_title(severity)) 
+
+sections <- unique(guidance$section)
+
+for (i in seq_along(sections)) {
+  this_section <- guidance %>% dplyr::filter(section == sections[i])
+  cat(paste("##",sections[i]))
+  cat("\n")
+  cat("\n")
+  for (j in seq_len(NROW(this_section))) {
+    cat(paste0("### ",this_section$description[j]))
+    cat("\n")
+    cat("\n")
+    cat(paste("Level:",this_section$severity[j]))
+    cat("\n")
+    cat("\n")
+    cat(paste0("Issue count: ",this_section$value[j]," (",this_section$percent[j],")"))
+    cat("\n")
+    cat("\n")
+    cat("**Recommendation**")
+    cat("\n")
+    cat("\n")
+    cat(this_section$recommendation[j])
+    cat("\n")
+    cat("\n")
+    cat(this_section$details[j])
+    cat("\n")
+    cat("\n")
+  }  
+      
+}
 
 ```
