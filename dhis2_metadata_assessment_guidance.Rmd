@@ -23,7 +23,7 @@ pacman::p_load(jsonlite, httr, purrr,knitr,magrittr,dplyr,yaml,knitr,rmarkdown,s
 
 source("R/utils.R")
 
-views <- transformYAMLtoControlFile() 
+views <- transformYAMLtoControlFile()
 
 
 ```
@@ -63,8 +63,8 @@ for (i in seq_along(sections)) {
     cat(paste0(">",stringr::str_replace_all(this_section$details_sql[j],"\\*","\\\\*")))
     cat("\n")
     cat("\n")
-  }  
-      
+  }
+
 }
 
 ```
