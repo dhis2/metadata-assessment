@@ -1,0 +1,68 @@
+# Copyright (c) 2021, University of Oslo
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# Redistributions of source code must retain the above copyright notice, this
+# list of conditions and the following disclaimer.
+#
+# Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+# Neither the name of the HISP project nor the names of its contributors may
+# be used to endorse or promote products derived from this software without
+# specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+# ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+---
+  summary_uid: ubUZycuJ8VM
+  name: cocs_disjoint_associations
+  description: Category option combinations with disjoint associations.
+  section: Categories
+  section_order: 4
+  summary_sql: >-
+    WITH cocs_disjoint_associations as (
+    SELECT DISTINCT a.categorycomboid, b.categoryoptionid from categorycombos_optioncombos a
+    INNER JOIN  categoryoptioncombos_categoryoptions  b on a.categoryoptioncomboid= b.categoryoptioncomboid
+    EXCEPT
+    SELECT a.categorycomboid,b.categoryoptionid from categorycombos_categories a
+    INNER JOIN categories_categoryoptions b on a.categoryid = b.categoryid )
+    SELECT 'cocs_disjoint_associations' as indicator,
+    COUNT(*)::varchar as value,
+    (100 * COUNT(*) / (SELECT COUNT(*) FROM categoryoptioncombo)) || '%' as percent,
+    'Category option combinations with disjoint associations.' as description
+    FROM cocs_disjoint_associations;
+  details_uid: ubUZycuJ8VM
+  details_sql: >-
+    WITH foo as (
+    SELECT DISTINCT a.categorycomboid, b.categoryoptionid from categorycombos_optioncombos a
+    INNER JOIN  categoryoptioncombos_categoryoptions  b on a.categoryoptioncomboid= b.categoryoptioncomboid
+    EXCEPT
+    SELECT a.categorycomboid,b.categoryoptionid from categorycombos_categories a
+    INNER JOIN categories_categoryoptions b on a.categoryid = b.categoryid )
+    SELECT y.uid as catcombo_uid,z.uid as catoption_uid,y.name as catcombo_name,z.name as catoption_name from foo x
+    INNER JOIN categorycombo y on x.categorycomboid = y.categorycomboid
+    INNER JOIN dataelementcategoryoption z on x. categoryoptionid = z. categoryoptionid;
+  severity: SEVERE
+  introduction: >
+    Under certain circumstances, category option combinations may exist in the system, but not have any direct
+    association with category options which are associated with the category combinations. This situation
+    usually occurs when category options have been added to a category and then the category is added
+    to a category combination. New category option combinations are created in the system at this point.
+    If any of the category options are then removed in one of the underlying categories, a so-called disjoint
+    category option combination may result. This is a category option combination which has no direct
+    association with any category options in any of the categories.
+  recommendation: >
+    The disjoint category option combinations should be removed from the system if possible. However,
+    if any data is associated with the category option combination, a determination will need to be
+    made in regards of how to deal with this data.
