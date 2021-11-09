@@ -40,7 +40,7 @@
     where ogs.compulsory = true group by ogm.organisationunitid)
     select 'orgunit_notincompulsory' as indicator,
     count(*)::varchar as value,
-    (100*count(*)/(select count(*) from organisationunit))||'%' as percent,
+    (100*count(*)/(select count(*) from organisationunit)) || '%' as percent,
     'Orgunits that are not in all compulsory orgunit group sets' as description
     from orgunit_compulsory_group_count where actual != expected;
   details_uid: HnmKIwXFWy5
