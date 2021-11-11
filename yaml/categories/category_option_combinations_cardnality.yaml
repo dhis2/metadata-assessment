@@ -32,32 +32,42 @@
   section_order: 5
   summary_sql: >-
     WITH cocs_wrong_cardinality as (
-    SELECT DISTINCT a.categorycomboid, b.categoryoptionid from categorycombos_optioncombos a
-    INNER JOIN  categoryoptioncombos_categoryoptions  b on a.categoryoptioncomboid= b.categoryoptioncomboid
-    EXCEPT
-    SELECT a.categorycomboid,b.categoryoptionid from categorycombos_categories a
-    INNER JOIN categories_categoryoptions b on a.categoryid = b.categoryid )
-    SELECT 'cocs_disjoint_associations' as indicator,
+    SELECT foo.categorycomboid,foo.categoryoptioncomboid,foo.actual_cardnality,bar.theoretical_cardnality FROM (
+    SELECT b.categorycomboid,a.categoryoptioncomboid, COUNT(*) as actual_cardnality
+    FROM categoryoptioncombos_categoryoptions a
+    INNER JOIN categorycombos_optioncombos b on a.categoryoptioncomboid = b.categoryoptioncomboid
+    GROUP BY b.categorycomboid,a.categoryoptioncomboid ) as foo
+    INNER JOIN
+    (SELECT categorycomboid,COUNT(*) as theoretical_cardnality FROM categorycombos_categories
+     GROUP BY categorycomboid) bar on foo.categorycomboid = bar.categorycomboid
+    WHERE foo.actual_cardnality != bar.theoretical_cardnality )
+    SELECT 'cocs_wrong_cardinality' as indicator,
     COUNT(*)::varchar as value,
     ROUND( (100.0 * COUNT(*) / (SELECT COUNT(*) FROM categoryoptioncombo))) || '%' as percent,
     'Category option combinations with incorrect cardnality.' as description
     FROM cocs_wrong_cardinality;
   details_uid: ZMsFbuKljqn
   details_sql: >-
-    WITH foo as (
-    SELECT DISTINCT a.categorycomboid, b.categoryoptionid from categorycombos_optioncombos a
-    INNER JOIN  categoryoptioncombos_categoryoptions  b on a.categoryoptioncomboid= b.categoryoptioncomboid
-    EXCEPT
-    SELECT a.categorycomboid,b.categoryoptionid from categorycombos_categories a
-    INNER JOIN categories_categoryoptions b on a.categoryid = b.categoryid )
-    SELECT y.uid as catcombo_uid,z.uid as catoption_uid,y.name,z.name from foo x
-    INNER JOIN categorycombo y on x.categorycomboid = y.categorycomboid
-    INNER JOIN dataelementcategoryoption z on x. categoryoptionid = z. categoryoptionid;
+    WITH baz as (
+    SELECT foo.categorycomboid,foo.categoryoptioncomboid,foo.actual_cardnality,bar.theoretical_cardnality FROM (
+    SELECT b.categorycomboid,a.categoryoptioncomboid, COUNT(*) as actual_cardnality
+    FROM categoryoptioncombos_categoryoptions a
+    INNER JOIN categorycombos_optioncombos b on a.categoryoptioncomboid = b.categoryoptioncomboid
+    GROUP BY b.categorycomboid,a.categoryoptioncomboid ) as foo
+    INNER JOIN
+    (SELECT categorycomboid,COUNT(*) as theoretical_cardnality FROM categorycombos_categories
+     GROUP BY categorycomboid) bar on foo.categorycomboid = bar.categorycomboid
+    WHERE foo.actual_cardnality != bar.theoretical_cardnality )
+    SELECT x.uid as catcombo_uid,y.uid as coc_uid,x.name as catcombo_name,y.name as coc_name,
+    baz.actual_cardnality,baz.theoretical_cardnality
+    FROM baz
+    INNER JOIN categorycombo x on baz.categorycomboid = x.categorycomboid
+    INNER JOIN categoryoptioncombo y on baz.categoryoptioncomboid = y.categoryoptioncomboid;
   severity: SEVERE
   introduction: >
     All category option combinations should have exactly the same number of category option associations
     as the number of categories in the category combination. If there are two categories in a category
     combination, then every category option combination should have exactly two category options.
   recommendation: >
-    Category option combinations which have an incorrect cardinality will be ignored by the DHIS2 
+    Category option combinations which have an incorrect cardinality will be ignored by the DHIS2
     analytics system and should be removed.
