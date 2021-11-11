@@ -25,12 +25,12 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ---
-  name: des_no_orgunits
+  name: aggregate_des_no_orgunits
   description: Aggregate data elements assigned to 1 or less orgunit
-  section: Data elements
-  section_order: 2
+  section: Data elements (aggregate)
+  section_order: 3
   summary_uid: hN9QvyXRdQC
-  summary_sql: >
+  summary_sql: >-
      WITH des_no_orgunits AS (
      select uid,name from dataelement
      where (dataelementid not in (select dataelementid from datasetelement))
@@ -45,13 +45,13 @@
      WHERE de.domaintype = 'AGGREGATE'
      group by dataelementid having count(dss.*) = 1))) order by name
      )
-     SELECT 'des_no_orgunits' as indicator,
+     SELECT 'aggregate_des_no_orgunits' as indicator,
      COUNT(*) as value,
      ROUND(( COUNT(*)::numeric / ( SELECT COUNT(*) FROM dataelement where domaintype = 'AGGREGATE' )::numeric) * 100)::varchar || '%' as percent,
      'Aggregate data elements assigned to 1 or less orgunit' as description
      FROM des_no_orgunits;
   details_uid: xdx9XquVi30
-  details_sql: >
+  details_sql: >-
     select uid,name from dataelement
     where (dataelementid not in (select dataelementid from datasetelement))
     AND domaintype = 'AGGREGATE'

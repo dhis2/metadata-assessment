@@ -25,32 +25,22 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ---
-  name: aggregate_des_nongrouped
-  description: Aggregate data elements not in any data element groups.
+  name: aggregate_des_count
+  description: Total count of aggregate data elements
   section: Data elements (aggregate)
-  section_order: 4
-  summary_uid: f4YhSfEAbHN
+  section_order: 1
+  summary_uid: wuUpo9fORN8
   summary_sql: >-
-   select 'aggregate_des_nongrouped' as indicator,
-   count(*)::varchar as value,
-   (100*count(*)/(select count(*) from dataelement where domaintype = 'AGGREGATE'))::varchar || '%' as percent,
-   'Aggregate data elements not in any data element groups.' as description
-   from dataelement where domaintype = 'AGGREGATE'
-   and dataelementid not in (select dataelementid from dataelementgroupmembers);
-  details_uid: bOxvtqRYGXh
+    select 'aggregate_de_count' as indicator,
+    count(*)::varchar as value,
+    '100%' as percent,
+    'Total count of aggregate data elements' as description
+    from dataelement where domaintype = 'AGGREGATE';
+  details_uid: SvH33Yk0iQM
   details_sql: >-
-    select uid,name from dataelement
-    where domaintype = 'AGGREGATE'
-    and dataelementid not in (select dataelementid from dataelementgroupmembers)
+    SELECT uid,name
+    FROM dataelement where domaintype = 'AGGREGATE'
     ORDER BY name;
-  severity: WARNING
-  introduction: >
-    All data elements should be in a data element group.
-    This allows users to find the data elements more easily in analysis
-     apps and also contributes to having more complete data element group sets.
-     Maintenance operations can also be made more efficient by applying
-     bulk settings (ex. sharing) to all data elements within a data element group.
-  recommendation: >
-    Data elements that are not in a data element group should be added to a relevant
-    data element group. If the data elements are not needed, they should be deleted.
-
+  severity: INFO
+  introduction: Overview of the number of aggregate data elements in the system.
+  recommendation: DHIS2 should contain useful data elements for users.

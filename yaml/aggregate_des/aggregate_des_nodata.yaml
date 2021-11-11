@@ -27,8 +27,8 @@
 ---
   name: aggregate_des_nodata
   description: Aggregate data elements with NO data values
-  section: Data elements
-  section_order: 5
+  section: Data elements (aggregate)
+  section_order: 6
   summary_uid: yc9MsMnAGCj
   summary_sql: >-
     select 'aggregate_des_nodata' as indicator,

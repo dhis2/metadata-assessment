@@ -26,10 +26,10 @@
 #
 ---
   name: aggregate_des_no_analysis
-  summary_uid: lY1DmLxMl7h
   description: Aggregate data elements not used in any favourites (directly or through indicators)
-  section: Data elements
-  section_order: 1
+  section: Data elements (aggregate)
+  section_order: 2
+  summary_uid: lY1DmLxMl7h
   summary_sql: >-
     WITH des_no_analysis AS (
     select name,uid from dataelement where domaintype = 'AGGREGATE' and
@@ -68,7 +68,7 @@
     either directly or indirectly through indicators, should be reviewed
     to determine if they still need to be collected. If these are meant to be used
     in routine review, then associated outputs should be created using them. If these
-     data elements are not going to be used for any type of information review,
-     consideration should be made to either archive them or delete them.
+    data elements are not going to be used for any type of information review,
+    consideration should be made to either archive them or delete them.
 
 

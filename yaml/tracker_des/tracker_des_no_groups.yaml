@@ -25,22 +25,23 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ---
-  name: aggregate_des_nongrouped
-  description: Aggregate data elements not in any data element groups.
-  section: Data elements (aggregate)
-  section_order: 4
-  summary_uid: f4YhSfEAbHN
+  name: tracker_des_nongrouped
+  description: Tracker data elements not in any data element groups.
+  section: Data elements (tracker)
+  section_order: 2
+  summary_uid: WUg1AK7VDEw
   summary_sql: >-
-   select 'aggregate_des_nongrouped' as indicator,
+   select 'tracker_des_nongrouped' as indicator,
    count(*)::varchar as value,
-   (100*count(*)/(select count(*) from dataelement where domaintype = 'AGGREGATE'))::varchar || '%' as percent,
-   'Aggregate data elements not in any data element groups.' as description
-   from dataelement where domaintype = 'AGGREGATE'
+   (100*count(*)/(select count(*) from dataelement where domaintype =    
+   'TRACKER'))::varchar || '%' as percent,
+   'Tracker data elements not in any data element groups.' as description
+   from dataelement where domaintype = 'TRACKER'
    and dataelementid not in (select dataelementid from dataelementgroupmembers);
-  details_uid: bOxvtqRYGXh
+  details_uid: hFgm57sWTqR
   details_sql: >-
     select uid,name from dataelement
-    where domaintype = 'AGGREGATE'
+    where domaintype = 'TRACKER'
     and dataelementid not in (select dataelementid from dataelementgroupmembers)
     ORDER BY name;
   severity: WARNING

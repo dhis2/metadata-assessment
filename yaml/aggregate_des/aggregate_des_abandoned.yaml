@@ -27,8 +27,8 @@
 ---
   name: aggregate_des_abandoned
   description: Aggregate data elements that have not been changed in last 100 days and do not have any data values
-  section: Data elements
-  section_order: 4
+  section: Data elements (aggregate)
+  section_order: 5
   summary_uid: HA8SfI5Ww6L
   summary_sql: >-
     select 'aggregate_des_abandoned' as indicator,count(*)::varchar as value,
@@ -48,16 +48,11 @@
     ORDER BY name;
   severity: WARNING
   introduction: >
-    * Data elements that should have recent data values but do not
-    should be reviewed to determine if the program intends to keep
-    reporting on them; if not these should be removed from the dataset
-    or program they are associated with.
-
-    * "Abandoned" data elements. These are data elements that have not
-     been updated in at least 100 days and do not have any data values
-     associated with them.
+    "Abandoned" data elements. These are data elements that have not
+    been updated in at least 100 days and do not have any data values
+    associated with them.
   recommendation: >
-    Data elements which are no longer being reported on should be removed
-    from datasets.
+    Data elements that have no data associated with them and which there are no plans
+    to start using for data collection should be deleted.
 
 
