@@ -1,0 +1,95 @@
+# Copyright (c) 2021, University of Oslo
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# Redistributions of source code must retain the above copyright notice, this
+# list of conditions and the following disclaimer.
+#
+# Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+# Neither the name of the HISP project nor the names of its contributors may
+# be used to endorse or promote products derived from this software without
+# specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+# ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+---
+  summary_uid: onf9p3FukmT
+  name: duplicated_coc_within_catcombo
+  description: Duplicated category option combinations within a category combination.
+  section: Categories
+  section_order: 8
+  summary_sql: >-
+    WITH duplicated_coc_within_catcombo  AS (
+    SELECT categorycomboid, members,COUNT(categoryoptioncomboid) FROM (
+    SELECT x.categorycomboid, x.categoryoptioncomboid,array_to_string(array_agg(x.categoryoptionid),',') as members
+    FROM (
+    SELECT  b.categorycomboid,a.categoryoptioncomboid,a.categoryoptionid
+    from categoryoptioncombos_categoryoptions a
+    INNER JOIN categorycombos_optioncombos b
+    ON a.categoryoptioncomboid = b.categoryoptioncomboid
+    ORDER BY categorycomboid,categoryoptioncomboid,categoryoptionid
+    ) as x
+    GROUP BY categorycomboid,categoryoptioncomboid
+    ORDER BY members
+    ) as y
+    GROUP BY categorycomboid,members
+    HAVING COUNT(*) > 1)
+    SELECT 'duplicated_coc_within_category' as indicator,
+    COUNT(*)::varchar as value,
+    ROUND( 100.0 * COUNT(*) / (SELECT COUNT(*) FROM categoryoptioncombo) ) || '%' as percent,
+    'Duplicated category option combinations within a category combination.' as description
+    FROM duplicated_coc_within_catcombo;
+  details_uid: Qd6vj3XFaiV
+  details_sql: >-
+    WITH m as (
+    SELECT k.categorycomboid, k.categoryoptioncomboid,array_to_string(array_agg(k.categoryoptionid),',') as members
+    FROM (
+    SELECT  j.categorycomboid,i.categoryoptioncomboid,i.categoryoptionid
+    from categoryoptioncombos_categoryoptions i
+    INNER JOIN categorycombos_optioncombos j
+    ON i.categoryoptioncomboid = j.categoryoptioncomboid
+    ORDER BY categorycomboid,categoryoptioncomboid,categoryoptionid
+    ) as k
+    GROUP BY categorycomboid,categoryoptioncomboid
+    ORDER BY members)
+    SELECT cc.name as categorycombo, cc.uid as cc_uid,coc.name as categoryoptioncombo,coc.uid as coc_uid
+    FROM m
+    INNER JOIN (
+    SELECT categorycomboid, members,COUNT(categoryoptioncomboid) FROM (
+    SELECT x.categorycomboid, x.categoryoptioncomboid,array_to_string(array_agg(x.categoryoptionid),',') as members
+    FROM (
+    SELECT  b.categorycomboid,a.categoryoptioncomboid,a.categoryoptionid
+    from categoryoptioncombos_categoryoptions a
+    INNER JOIN categorycombos_optioncombos b
+    ON a.categoryoptioncomboid = b.categoryoptioncomboid
+    ORDER BY categorycomboid,categoryoptioncomboid,categoryoptionid ) as x
+    GROUP BY categorycomboid,categoryoptioncomboid
+    ORDER BY members ) as y
+    GROUP BY categorycomboid,members
+    HAVING COUNT(*) > 1
+    ) AS n
+    on m.categorycomboid = n.categorycomboid AND m.members = n.members
+    INNER JOIN categorycombo cc on m.categorycomboid = cc.categorycomboid
+    INNER JOIN categoryoptioncombo coc on m.categoryoptioncomboid = coc.categoryoptioncomboid;
+  severity: SEVERE
+  introduction: >
+    Within each category combination, a unique set of category option combinations should exist.
+    In certain circumstances, duplicate category option combinations may exist in the system.
+    This usually results from changes to category combinations after they have been created,
+    or direct manipulation of the various category tables in the database. This may result in
+    certain data element/category option combinations not appearing or being unavailable in the
+    data entry screens and/or analytics apps.
+  recommendation: >
+    Ligula justo lobortis etiam eget amet ut, sapien. Neque sed nam sociosqu nec suspendisse nam mollis velit ultrices.
