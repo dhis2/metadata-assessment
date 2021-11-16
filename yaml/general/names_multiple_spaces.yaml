@@ -202,7 +202,8 @@
     SELECT 'validationcriteria' AS table_name, name from validationcriteria WHERE name ~'\s{2,}'  UNION
     SELECT 'validationnotificationtemplate' AS table_name, name from validationnotificationtemplate WHERE name ~'\s{2,}'  UNION
     SELECT 'validationrule' AS table_name, name from validationrule WHERE name ~'\s{2,}'  UNION
-    SELECT 'validationrulegroup' AS table_name, name from validationrulegroup WHERE name ~'\s{2,}'
+    SELECT 'validationrulegroup' AS table_name, name from validationrulegroup WHERE name ~'\s{2,}' UNION
+    SELECT 'visualization' AS table_name, name from visualization WHERE name ~'\s{2,}')
     SELECT table_name,name from names_multiple_spaces
     ORDER BY table_name,name;
   severity: WARNING

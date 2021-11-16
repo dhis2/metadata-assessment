@@ -122,7 +122,7 @@
   details_uid: FCBp1MzbFN8
   details_sql: >-
     WITH names_leading_spaces as (
-    SELECT 'attribute' AS table_name, name from attribute WHERE name ~'^\s+'  UNION
+      SELECT 'attribute' AS table_name, name from attribute WHERE name ~'^\s+'  UNION
     SELECT 'categorycombo' AS table_name, name from categorycombo WHERE name ~'^\s+'  UNION
     SELECT 'categoryoptioncombo' AS table_name, name from categoryoptioncombo WHERE name ~'^\s+'  UNION
     SELECT 'categoryoptiongroup' AS table_name, name from categoryoptiongroup WHERE name ~'^\s+'  UNION
@@ -202,7 +202,8 @@
     SELECT 'validationcriteria' AS table_name, name from validationcriteria WHERE name ~'^\s+'  UNION
     SELECT 'validationnotificationtemplate' AS table_name, name from validationnotificationtemplate WHERE name ~'^\s+'  UNION
     SELECT 'validationrule' AS table_name, name from validationrule WHERE name ~'^\s+'  UNION
-    SELECT 'validationrulegroup' AS table_name, name from validationrulegroup WHERE name ~'^\s+'
+    SELECT 'validationrulegroup' AS table_name, name from validationrulegroup WHERE name ~'^\s+'  UNION
+    SELECT 'visualization' AS table_name, name from visualization WHERE name ~'^\s+')
     SELECT table_name,name from names_leading_spaces
     ORDER BY table_name,name;
   severity: WARNING
