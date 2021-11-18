@@ -102,15 +102,30 @@ Sys.setenv(dhis2_checks = TRUE)
 
 You should replace each of the variables with your particular details. 
 
-- baseurl: This should be the URL of your server. Please take note of using 
+- *baseurl*: This should be the URL of your server. Please take note of using 
 https instead of http. Also, the URL should end with a final "/".
-- username: Username of the user used to authenticate with the DHIS2 instance. 
+- *username*: Username of the user used to authenticate with the DHIS2 instance. 
 This user should at least have the ability to create SQL views. 
-- password: Password of the user which will connect to DHIS2. Take note
+- *password*: Password of the user which will connect to DHIS2. Take note
 that this password will be stored in clear text, so you should not  store
 this on a shared computer environment.
-- cleanup_views: If set to `TRUE` the SQL Views created during the generation
+- *cleanup_views*: If set to `TRUE` the SQL Views created during the generation
 of the report will be deleted after the report completes.
-- dhis2_checks: If set to `TRUE`, results from the DHIS2 data integrity
+- *dhis2_checks*: If set to `TRUE`, results from the DHIS2 data integrity
 checks will also be integrated into the report. Please take note, that 
 these integrity checks may take a very long time to run on larger databases. 
+
+
+Once you have completed each of these steps, open up the file `dhis2_metadata_assessment.Rmd`
+in RStudio. Press the "Knit" button, and wait for the report to complete. The report 
+will upload and create a series of SQL Views on your DHIS2 instance, and then 
+retrieve each of the results to combine them into a single HTML page. 
+
+The report is organized into a series of sections. The first section is a summary
+table which contains an overview of the results of each query. The second
+section presents summary figures and graphs related to users. The third section
+contains essentially the same information as the summary table, but also includes
+written guidance which helps explain the particular details of the problem, as well
+as a recommended approach of how to solve them. The last optional section of the 
+report contains the results of the DHIS2 integrity checks, if you chose to enable
+them during the generation of the report.
