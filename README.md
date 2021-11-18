@@ -6,8 +6,8 @@ Management of metadata integrity should be a primary concern for DHIS2 implement
 The DHIS2 API enforces a number of restrictions on various objects and their 
 relationships, but under certain circumstances, metadata objects may become
 corrupted. This may become especially apparent on DHIS2 systems which have been
-running for a number of years, and which have undergone extensive changes to 
-the metadata structure. 
+running for a number of years, and which have undergone extensive changes to the 
+systems metadata.
 
 Another common problem is the creation of metadata or analytic objects
 which are no longer in use (or perhaps never were). In order to keep the 
@@ -86,7 +86,7 @@ pacman::p_load(jsonlite, httr,purrr,knitr,magrittr,ggplot2,
 DT,dplyr,yaml,knitr,rmarkdown,dplyr,readr)
 ```
 
-- Create a file called `.Rprofile` in the top level directory of the clone git repository.
+- Create a file called `.Rprofile` in the top level directory of the cloned git repository.
 This should only be done on a private computer, since you will need to store authentication 
 details in this file. Alternatively, you can execute the commands in the R 
 console, if you are not comfortable storing authentication details in a 
