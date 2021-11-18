@@ -18,13 +18,13 @@ knitr::opts_chunk$set(echo = FALSE)
 
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(jsonlite, httr, purrr,knitr,magrittr,ggplot2,DT,dplyr,yaml,knitr,rmarkdown,dplyr,readr)
+server_version <- "2.34"
 
 source("R/utils.R")
 #Modify login details to the server as needed
 baseurl <- Sys.getenv("baseurl")
 username <- Sys.getenv("username")
 password <- Sys.getenv("password")
-
 
 views <- transformYAMLtoControlFile()
 
@@ -38,12 +38,29 @@ if (!me$status_code == 200L) {
   stop("Could not login to DHIS2")
 }
 
+getDHIS2Version <- function(d2_session = d2_session) {
+    httr::GET(paste0(baseurl,"api/system/info"),  handle= d2_session) %>% 
+    httr::content(.,"text") %>% 
+    jsonlite::fromJSON(.) %>% 
+    purrr::pluck("version")
+}
+
+checkVersion <- function(dhis2_version=getDHIS2Version()) {
+  
+  if (!grepl("2.35",dhis2_version)) {
+    stop(paste("DHIS2 version not supported"))
+  }
+}
+
+checkVersion(getDHIS2Version(d2_session))
+
  r <- uploadMetadata(metadata, d2_session)
  if (r$status_code != 200L) {
    stop("Could not upload metadata!")
  }
 
 
+ 
 ```
 
 # Target server: `r baseurl`
@@ -159,7 +176,6 @@ and expiation of each of the checks.
 
 ```{r guidance, echo=FALSE,message=FALSE,results="asis"}
 
-
 guidance <- results %>% 
   dplyr::left_join(views[,c("summary_uid","section","section_order","details_uid","severity","introduction","recommendation")] , by =c("uid"="summary_uid")) %>% 
   dplyr::arrange(section,section_order) %>%
@@ -199,5 +215,76 @@ for (i in seq_along(sections)) {
   }  
       
 }
+
+```
+
+
+
+```{r native_checks, echo=FALSE,message=FALSE,results="asis"}
+
+if (Sys.getenv("dhis2_checks") == "TRUE") {
+  cat("\n")
+  cat("\n")
+  cat("## DHIS2 Integrity Checks")
+  cat("\n")
+  cat("\n")
+   startNativeIntegrityCheck <- function(d2_session) {
+   
+   url <- paste0(d2_session$url,"api/dataIntegrity")
+   r <- httr::POST(url,httr::content_type_json(),handle = d2_session) 
+   
+   if (r$status_code != 200L) {
+     stop("Could not start DHIS2 integrity checks")
+   }
+   
+   httr::content(r,"text") %>% 
+   jsonlite::fromJSON(.) %>% 
+   purrr::pluck("response") %>% 
+   purrr::pluck("relativeNotifierEndpoint") %>% 
+   stringr::str_replace(.,"^/","")
+   
+   }
+   
+   pollNativeIntegrityChecks <- function(endpoint,d2_session) {
+   url <- paste0(d2_session$url,endpoint)
+   r <- httr::GET(url,httr::content_type_json(),handle = d2_session)
+  
+  completed <- FALSE
+  
+  while(!completed) {
+   Sys.sleep(5)
+   
+   completed <- httr::GET(url,httr::content_type_json(),handle = d2_session) %>% 
+   httr::content("text") %>% 
+   jsonlite::fromJSON(.) %>% 
+   dplyr::pull(completed) %>% 
+   any(.)
+  
+}
+  
+  #Now poll the system summary
+  url <- paste0(d2_session$url,"api/system/taskSummaries/DATA_INTEGRITY/",substring(endpoint,nchar(endpoint)-10))
+  
+  httr::GET(url,httr::content_type_json(),handle=d2_session) %>% 
+  httr::content("text") %>% 
+  jsonlite::fromJSON(.)
+   
+ }
+ 
+ endpoint <- startNativeIntegrityCheck(d2_session)
+
+ r <- pollNativeIntegrityChecks(endpoint,d2_session) 
+
+descriptions <- gsub('([[:upper:]])', ' \\1', names(r)) %>% 
+stringr::str_to_sentence()
+ 
+values <- lapply(r,length) %>%  unlist()
+
+native_checks <- data.frame(Description = descriptions,Count = values,stringsAsFactors = FALSE)
+row.names(native_checks) <- NULL
+
+DT::datatable(native_checks,escape = FALSE)
+}
+ 
 
 ```
