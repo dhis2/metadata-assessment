@@ -99,7 +99,12 @@ select 'orgunit_notincompulsory', count(*)::varchar , (100*count(*)/(select coun
 
 union all
 
-select 'orgunit_assignednotused_combo', count(*)::varchar , (100*count(*)/(select count(*) from datasetsource))||'%', 'Orgunit-dataset combinations with no complete data sets' from datasetsource where (datasetid,sourceid) not in (select datasetid,sourceid from completedatasetregistration group by datasetid,sourceid)
+select 'orgunit_assignednotused_combo', 
+count(*)::varchar , 
+(100*count(*)/(select count(*) from datasetsource))||'%',
+ 'Orgunit-dataset combinations with no complete data sets' from
+  datasetsource where (datasetid,sourceid) 
+  not in (select datasetid,sourceid from completedatasetregistration group by datasetid,sourceid)
 
 union all
 
@@ -118,7 +123,16 @@ select 'dashboard_private', count(*)::varchar, (100*count(*)/(select count(*) fr
 
 union all
 
-select 'dashboard_shared10+', count(*)::varchar, (100*count(*)/(select count(*) from dashboard))||'%', 'Dashboards shared with 10 or more people' from dashboard where dashboardid in (select dash.dashboardid from dashboardusergroupaccesses left join dashboard dash using(dashboardid) left join usergroupaccess uga using (usergroupaccessid) left join usergroupmembers ugm using (usergroupid) group by dash.dashboardid having count(*) >= 5) OR publicaccess like 'r%'
+select 'dashboard_shared10+', 
+count(*)::varchar, 
+(100*count(*)/(select count(*) from dashboard))||'%',
+ 'Dashboards shared with 10 or more people' 
+ from dashboard where dashboardid 
+ in (select dash.dashboardid from dashboardusergroupaccesses
+  left join dashboard dash using(dashboardid) 
+  left join usergroupaccess uga using (usergroupaccessid) 
+  left join usergroupmembers ugm using (usergroupid) 
+  group by dash.dashboardid having count(*) >= 5) OR publicaccess like 'r%'
 
 union all
 

@@ -64,6 +64,7 @@
     They can also be ordered. The order of the sections may become corrupted if sections are
     added or deleted.
   recommendation: >
-    Diam eu vehicula a accumsan velit arcu aenean lacus dui torquent. Vel curabitur at,
-    cubilia mauris cum ut parturient velit sit. Eu et ligula sed luctus.
-    Non ante eget suscipit turpis nibh vivamus blandit diam. Lectus molestie netus laoreet vitae non nostra ligula.
+    It is possible to fix the sort order of data set sections by using the `fixSortOrder` SQL
+    function which is available in the dhis2-utils Github repository
+    (https://github.com/dhis2/dhis2-utils/tree/master/resources/sql). Using this script you 
+    can fix the sort order for each affected data set section. 

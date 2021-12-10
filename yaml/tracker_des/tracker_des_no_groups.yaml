@@ -33,7 +33,7 @@
   summary_sql: >-
    select 'tracker_des_nongrouped' as indicator,
    count(*)::varchar as value,
-   (100*count(*)/(select count(*) from dataelement where domaintype =    
+   (100*count(*)/(select count(*) from dataelement where domaintype =
    'TRACKER'))::varchar || '%' as percent,
    'Tracker data elements not in any data element groups.' as description
    from dataelement where domaintype = 'TRACKER'
