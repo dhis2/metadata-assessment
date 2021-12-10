@@ -50,7 +50,7 @@
     with organsiation units. There are various reasons why geometries may be considered to be
     invalid including self-inclusions, self-intersections, and sliver polygons. Please see the
     PostGIS documentation for a more in-depth discussion on this topic.
-  recommendation:
+  recommendation: >
     Update the geometry of the affected organisation units to a valid geometry. It may be possible
     to use the PostGIS function `ST_MakeValid` to automatically fix the problem. However, in other
     cases the geometry may need to be edited in a GIS tool, and then updated again in DHIS2.
