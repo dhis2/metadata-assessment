@@ -92,4 +92,10 @@
     certain data element/category option combinations not appearing or being unavailable in the
     data entry screens and/or analytics apps.
   recommendation: >
-    Ligula justo lobortis etiam eget amet ut, sapien. Neque sed nam sociosqu nec suspendisse nam mollis velit ultrices.
+    Duplicated category option combinations within a category combination will require you
+    to merge category option combinations together. This will require direct manipulation
+    of the database, and should always be conducted first in a testing environment. Only
+    after you have thoroughly tested your procedure, and have confidence that it works,
+    should you perform the procedure on your production environment. The DHIS2 implementation
+    team has created a series of SQL functions to help you remove these duplicated COCs from your
+    system.

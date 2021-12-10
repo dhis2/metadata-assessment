@@ -49,12 +49,14 @@
    ORDER BY name;
   severity: WARNING
   introduction: >
-    Sed vestibulum, vitae. Aliquam tincidunt morbi sit class aenean.
-    Neque sodales vitae donec. Dis, vitae maecenas nec diam aenean, nec, sed.
-    Tincidunt mattis hac in non donec leo dictumst et feugiat commodo, curae.
-    Diam quis ac vestibulum nec lobortis id, in facilisi et felis.
+      In many cases users may create dashboards during trainings, for temporary purposes
+      or become inactive users. This may leave many abandoned dashboards in the system.
+      Ideally, these should be removed if they are no longer needed in order to keep the
+      system tidy.
   recommendation: >
-    Vestibulum quisque vel in dolor in proin,
-    ipsum et urna mauris. Sit lorem dis et hac non feugiat.
-    Mi pulvinar, curae nisi ipsum libero aliquet. Id id.
-    Sed tortor vestibulum tincidunt facilisi elementum mauris euismod, tincidunt.
+      Users with superuser permission should be able to delete dashboards directly
+      by looking up the name. Of course, a determination should be made if the dashboard
+      really is no longer in use before they are deleted. For large number of deletions,
+      you may need to use a script to delete them through the API. You should also
+      confirm that the dashboard is not in use by any push analysis before removing
+      it from the system.

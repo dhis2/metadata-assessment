@@ -163,6 +163,9 @@ getDetailsUID <- function(name,views) {
     dplyr::pull(id)
 }
 
-
-
+createRegistryYAML<- function() {
+  all_yaml_files<-list.files("yaml/",pattern="*.yaml",recursive = TRUE,full.names = FALSE)
+  r <- list(checks = all_yaml_files)
+  yaml::write_yaml(r,"data-integrity-checks.yaml")
+}
 
