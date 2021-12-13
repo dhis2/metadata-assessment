@@ -92,4 +92,6 @@
     certain data element/category option combinations not appearing or being unavailable in the
     data entry screens and/or analytics apps.
   recommendation: >
-    Ligula justo lobortis etiam eget amet ut, sapien. Neque sed nam sociosqu nec suspendisse nam mollis velit ultrices.
+    Category option combinations should be deduplicated, so that only one category option 
+    combination exists for each combination of options within a category combination. This
+    is a relatively complex process that can only be performed directly in the database.

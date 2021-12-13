@@ -26,7 +26,7 @@
 #
 ---
   name: assessment_dashboards_no_views_1y
-  description: Dashboards not viewed in the past one year
+  description: Dashboards not viewed in the past one year.
   section: Dashboards
   section_order: 3
   summary_uid: BsJqjX8CK2y
@@ -50,13 +50,13 @@
      GROUP BY favoriteuid);
   severity: WARNING
   introduction: >
-    All dashboards should be reviewed routinely.
-    Dashboards that are no longer viewed routinely are not being used, or potentially being used incorrectly.
-    The definition of "routine" may vary
-    between implementations and therefore you can assess this over both the
-    last 12 months as well as a pre-defined period of your choosing.
+    All dashboards should be reviewed routinely. Dashboards that are no longer viewed 
+    routinely are not being used, or potentially being used incorrectly. The definition of
+    "routine" may vary between implementations and therefore you can assess this over both 
+    the last 12 months (default) as well as a pre-defined period of your choosing.
   recommendation: >
-    Dashboards that should be reviewed routinely and are not point
-    to a broader data use issue that will not be addressed by technical means.
-    Such dashboards may need to be kept while a process for reviewing
-    them more frequently becomes more well defined.
+    Dashboards that should be reviewed routinely and are not point to a broader data use
+    issue that will not be addressed by technical means. Such dashboards may need to be 
+    kept while a process for reviewing them more frequently becomes more well defined. Such
+    unused dashboards may also be, for example, private dashboards for users who are no 
+    longer active.

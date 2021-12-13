@@ -27,7 +27,7 @@
 ---
   summary_uid: fQiLUgDYrz5
   name: categories_no_options
-  description: Categories with no category options
+  description: Categories with no category options.
   section: Categories
   section_order: 2
   summary_sql: >-
@@ -45,7 +45,7 @@
     ORDER BY name;
   severity: WARNING
   introduction: >
-    Categories should always have at least a single category options.
+    Categories should always have at least a single category option.
   recommendation: >
     Any categories without category options should either be removed from the
     system if they are not in use. Otherwise, appropriate category options

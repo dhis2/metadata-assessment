@@ -49,12 +49,10 @@
    ORDER BY name;
   severity: WARNING
   introduction: >
-    Sed vestibulum, vitae. Aliquam tincidunt morbi sit class aenean.
-    Neque sodales vitae donec. Dis, vitae maecenas nec diam aenean, nec, sed.
-    Tincidunt mattis hac in non donec leo dictumst et feugiat commodo, curae.
-    Diam quis ac vestibulum nec lobortis id, in facilisi et felis.
+    All dashboards should be reviewed routinely. Dashboards have been view one or less times
+    over a three year period are not being used.
   recommendation: >
-    Vestibulum quisque vel in dolor in proin,
-    ipsum et urna mauris. Sit lorem dis et hac non feugiat.
-    Mi pulvinar, curae nisi ipsum libero aliquet. Id id.
-    Sed tortor vestibulum tincidunt facilisi elementum mauris euismod, tincidunt.
+    Dashboards that are not used may need to be reviewed, or could potentially be deleted.
+    Further assessment into whether the dashboards are public, shared with user groups, or
+    private may help guide the decision on whether the dashboards could be deleted or not.
+
