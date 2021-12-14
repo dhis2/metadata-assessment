@@ -42,7 +42,7 @@
     (100 * COUNT(*) / (SELECT COUNT(*) FROM categoryoptioncombo)) || '%' as percent,
     'Category option combinations with disjoint associations.' as description
     FROM cocs_disjoint_associations;
-  details_uid: ubUZycuJ8VM
+  details_uid: VFqTzfnhQoy
   details_sql: >-
     WITH foo as (
     SELECT DISTINCT a.categorycomboid, b.categoryoptionid from categorycombos_optioncombos a

@@ -209,7 +209,7 @@
   severity: WARNING
   introduction: >
     Identifiable objects with names should not contain leading spaces.
-  recommendation: >-
+  recommendation: |
     These objects may be able to be corrected through the user interface of DHIS2. Alternatively,
     they can be corrected directly in the database using SQL. You can use the following SQL as a
     pattern to help you create the exact query which you need:

@@ -73,7 +73,7 @@
     All active datasets should have data values associated with them.
     Active data sets are data sets which should be currently used
     (this is defined as within the last 3 reporting periods) to collect data.
-  recommendation: >
+  recommendation: |
     * If a data set is not being updated with new data or no new data values
     are being entered within the last 3 periods (relative to the period type
     assigned to the dataset ex. monthly will be the last 3 months, quarterly the last 3 quarters)

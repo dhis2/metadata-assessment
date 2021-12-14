@@ -70,7 +70,7 @@
   recommendation: >
     If it is possible to open the option set in the maintenance app, you can resort the option set,
     which should correct the problem. Another possible solution is to directly update the sort_order
-    property of in the optionset table in the database, ensuring that a valid sequence is present
+    property of in the `optionset` table in the database, ensuring that a valid sequence is present
     for all options in the option set.
 
 

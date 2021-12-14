@@ -67,8 +67,8 @@
     the point of [Null Island](https://en.wikipedia.org/wiki/Null_Island). This is the point
     on the earths surface where the Prime Meridian and Equator intersect with a latitude of 0
     and a longitude of zero. The point also happens to be situated currently in the middle of the
-    ocean. This query identifes any points located within 100 km of the point having latitude
+    ocean. This query identifies any points located within 100 km of the point having latitude
     and longitude equal to zero.
   recommendation:
-    Update the coordinates of the affected organisation unit to the correct location.
+    Update the coordinates of the affected organization unit to the correct location.
 
