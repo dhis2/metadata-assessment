@@ -23,8 +23,8 @@ DHIS2 implementers on how to fix these problems in their system.
 
 ## About this tool
 
-This tool kit consists of a series of SQL queires which have been created
-by the DHIS2 Implementation team to identify potential metadata issues in 
+This tool kit consists of a series of SQL queries which have been created
+by the DHIS2 Implementation and Development Teams to identify potential metadata issues in 
 DHIS2 databases. The metadata checks in this tool have been organized in a series of YAML
 files. YAML is a user-friendly data serialization language which can be 
 parsed by a number of different programming languages. It is also exceptionally
@@ -33,24 +33,31 @@ which consists of a number of key value pairs. Each of these keys will be explai
 
 - *summary_uid*: A predefined DHIS2 UID which is used to identify the 
 summary SQL query for this check.
-
-- *name*: The name of the SQL query. 
+- *name*: The name of the SQL query. This name should be relatively short but descriptive. It should also
+be written in snake case so that a valid database view name can be created using this field.
 - *description*: A short description of the issue.
 - *section*: Used in the R-markdown report to group related issues together. 
 Generally these are related metadata objects like indicators or data elements.
 - *section_order*: Used in the R-markdown report to order issues within a section.
 - *summary_sql*: An SQL query which is used to produce a single row which summarizes
-the particular issue. Each query should return four columns and one row. The query should return the
-name of the issue, the total number of affected metadata objects, the percent 
-of the affected objects versus the overall number of objects, and a description.
+the particular issue. Each query should return four columns and one row.
+     - indicator: This should be the same as the `name` field above.
+     - count: This should return total number of object which are flagged 
+       by the particular check. The field should be returned as      a `vachar`. 
+     - percent: Where possible this field should calculate the percentage of 
+       the objects flagged by this particular test versus the 
+       total number of objects in the same class.
+     - description: A brief description of the the issue, probably the same as 
+       the description field above.
 - *details_sql*: An SQL query which should return one or more rows of all 
 metadata objects which violate this particular metadata check. At the very least,
 the query should consist of the UID and name of the object, and in certain cases
 may contain other fields which will make the identification of the specific object easier in order to rectify the problem. 
 - *severity*: This field is used to indicate the overall severity of a particular problem. 
     - INFO: Indicates that this is for information only.
-    - WARNING: A warning indicates that this may be a problem, but not necessarily an error. It is however recommended to triage these issues.
-    - SEVERE: An error which should be fixed, but which may not nessarily lead to
+    - WARNING: A warning indicates that this may be a problem, but not 
+    necessarily an error. It is however recommended to triage these issues.
+    - SEVERE: An error which should be fixed, but which may not necessarily lead to
     the system not functioning. 
     - CRITICAL: An error which must be fixed, and which may lead to end-user
     error or system crashes.

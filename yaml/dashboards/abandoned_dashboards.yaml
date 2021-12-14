@@ -49,10 +49,14 @@
    ORDER BY name;
   severity: WARNING
   introduction: >
-    All dashboards should be reviewed routinely. Dashboards have been view one or less times
-    over a three year period are not being used.
+      In many cases users may create dashboards during trainings, for temporary purposes
+      or become inactive users. This may leave many abandoned dashboards in the system.
+      Ideally, these should be removed if they are no longer needed in order to keep the
+      system tidy.
   recommendation: >
-    Dashboards that are not used may need to be reviewed, or could potentially be deleted.
-    Further assessment into whether the dashboards are public, shared with user groups, or
-    private may help guide the decision on whether the dashboards could be deleted or not.
-
+      Users with superuser permission should be able to delete dashboards directly
+      by looking up the name. Of course, a determination should be made if the dashboard
+      really is no longer in use before they are deleted. For large number of deletions,
+      you may need to use a script to delete them through the API. You should also
+      confirm that the dashboard is not in use by any push analysis before removing
+      it from the system.

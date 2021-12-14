@@ -32,7 +32,7 @@
   summary_uid: HA8SfI5Ww6L
   summary_sql: >-
     select 'aggregate_des_abandoned' as indicator,count(*)::varchar as value,
-    (100*count(*)/(select count(*) from dataelement where domaintype = 'AGGREGATE'))||'%' as percent,
+    (100*count(*)/(select count(*) from dataelement where domaintype = 'AGGREGATE'))|| '%' as percent,
     'Aggregate data elements that have not been changed in last 100 days and do not have any data values' as description
     from dataelement where domaintype = 'AGGREGATE'
     and dataelementid
