@@ -47,15 +47,9 @@
     ORDER BY name
   severity: CRITICAL
   introduction: >
-    Donec mauris interdum sed eget odio.
-    Quisque eget curabitur tellus, quis diam at phasellus vel.
-    Leo amet, a sit pharetra sed varius. Diam tincidunt ex elementum vehicula
-    justo lorem lorem maecenas, pellentesque.
+    Every DHIS2 system should have a single root organisation unit. This means a single organisation
+    unit from which all other branches of the hierarchy are descendants.
   recommendation: >
-    Vel nec fringilla diam conubia conubia et ipsum nec.
-    Condimentum per elementum et urna diam mauris et.
-    Massa at enim eu a justo ut a dui in. Magna cubilia, enim
-    dui justo netus maximus lobortis ut enim donec feugiat.
-    Tristique eu laoreet non eros eleifend mi, metus morbi natoque volutpat sociosqu.
-    At fermentum ut quis, pulvinar ac duis. Laoreet tempor natoque sociis
-    porta nunc turpis ante sed.
+    Once you have decided which organisation unit should be the real root of the organisation
+    unit hierarchy, you should update the parent organisation unit. This can be done by using
+    the DHIS2 API or my updating the value directly in the `organisationunit` table.

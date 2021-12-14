@@ -53,7 +53,7 @@
   severity: CRITICAL
   introduction: >
     There should only be a single 'default' category option combination in the system.
-    Having multiple default category option combinations may lead to irregularties in
+    Having multiple default category option combinations may lead to irregularities in
     both data entry as well as analytical outputs.
   recommendation: >
     All references to the additional default category option combination should be replaced

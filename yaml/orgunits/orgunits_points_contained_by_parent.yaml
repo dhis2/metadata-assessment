@@ -57,13 +57,13 @@
   introduction: >
     Facilities are often represented as points in the DHIS2 hierarchy. Their parent organisation units
     geometry should contain all facilities which have been associated with them.
-  recommendation:
+  recommendation: |
     Often boundary files are simplified when they are uploaded into DHIS2. This process may result in
     facilities which are located close to the border of a given district to fall outside of the district
     when the boundary is simplified. This is considered to be more of a cosmetic problem for most DHIS2
     installations, but could become an issue if any geospatial analysis is attempted using the
-    boundaries and point coordinates. 
-    
+    boundaries and point coordinates.
+
     In cases where the facility falls outside of its parent's boundary
     you should confirm that the coordinates are correct. If the location is close to the boundary, you
     may want to reconsider how the boundary files have been simplified. Otherwise, if the location of

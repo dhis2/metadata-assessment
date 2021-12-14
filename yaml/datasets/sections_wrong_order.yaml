@@ -66,5 +66,5 @@
   recommendation: >
     It is possible to fix the sort order of data set sections by using the `fixSortOrder` SQL
     function which is available in the dhis2-utils Github repository
-    (https://github.com/dhis2/dhis2-utils/tree/master/resources/sql). Using this script you 
-    can fix the sort order for each affected data set section. 
+    (https://github.com/dhis2/dhis2-utils/tree/master/resources/sql). Using this script you
+    can fix the sort order for each affected data set section.

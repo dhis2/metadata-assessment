@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(jsonlite, httr, purrr,knitr,magrittr,ggplot2,DT,dplyr,yaml,knitr,rmarkdown,dplyr,readr)
-server_version <- "2.34"
+
 
 source("R/utils.R")
 #Modify login details to the server as needed
@@ -47,12 +47,12 @@ getDHIS2Version <- function(d2_session = d2_session) {
 
 checkVersion <- function(dhis2_version=getDHIS2Version()) {
   
-  if (!grepl("2.35",dhis2_version)) {
-    stop(paste("DHIS2 version not supported"))
+  if (!grepl("2.36.4",dhis2_version)) {
+    warning(paste("DHIS2 version not supported"))
   }
 }
 
-checkVersion(getDHIS2Version(d2_session))
+#checkVersion(getDHIS2Version(d2_session))
 
  r <- uploadMetadata(metadata, d2_session)
  if (r$status_code != 200L) {
