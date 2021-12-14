@@ -59,10 +59,10 @@
     order by name;
   severity: WARNING
   introduction: >
-    All data elements that are captured in DHIS2 should be used to produce some type of
+    All aggregatge data elements that are captured in DHIS2 should be used to produce some type of
     analysis output (charts, maps, tables). This can be by using them directly
     in an output, or by having them contribute to an indicator calculation
-    that is used an output.
+    that is used an output. 
   recommendation: >
     Data elements that are not routinely being reviewed in analysis,
     either directly or indirectly through indicators, should be reviewed

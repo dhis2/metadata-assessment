@@ -26,7 +26,7 @@
 #
 ---
   name: datasets_abandoned
-  description: Data sets that have not been changed in last 100 days and are assigned to 1 or less orgunits
+  description: Data sets that have not been changed in last 100 days and are assigned to 1 or less orgunits.
   section: Datasets
   section_order: 2
   summary_uid: jliUzKxgkkH
@@ -48,9 +48,10 @@
      ORDER BY name;
   severity: WARNING
   introduction: >
-     Datasets should generally be assigned to multiple organisation units, and should have been used
-     recently (e.g. 100 days). Unused datasets may increase the response time of the data entry
-     app. Users may also by mistake enter data into inactive datasets.
+     Datasets should generally be assigned to multiple organisation units if they are used,
+     or be modified recently (e.g. last 100 days) if they are under development. Unused 
+     datasets represent unnecessary clutter in the database and confuse users and 
+     administrators.
   recommendation: >
-     Datasets which are not active should be removed from the system to decrease system clutter
-     and metadata size.
+     Datasets which are not activly used or in development should be removed from the 
+     system to decrease system clutter and metadata size.

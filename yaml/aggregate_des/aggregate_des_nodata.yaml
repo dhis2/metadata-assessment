@@ -26,7 +26,7 @@
 #
 ---
   name: aggregate_des_nodata
-  description: Aggregate data elements with NO data values
+  description: Aggregate data elements with NO data values.
   section: Data elements (aggregate)
   section_order: 6
   summary_uid: yc9MsMnAGCj
@@ -50,6 +50,6 @@
     If data elements exist in a data set which is active, but there are no
     data values associated with them, they may not be part of the data entry
     screens. Another possibility is that they simply do have have any data
-    at all, because they are unable to be reported on.
+    at all, because users are unable to be reported on.
   recommendation: >
     Consider removing data elements with no data values.

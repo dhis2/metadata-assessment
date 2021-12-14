@@ -26,7 +26,7 @@
 #
 ---
   name: aggregate_des_abandoned
-  description: Aggregate data elements that have not been changed in last 100 days and do not have any data values
+  description: Aggregate data elements that have not been changed in last 100 days and do not have any data values.
   section: Data elements (aggregate)
   section_order: 5
   summary_uid: HA8SfI5Ww6L

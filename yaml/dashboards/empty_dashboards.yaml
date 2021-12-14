@@ -26,7 +26,7 @@
 #
 ---
   name: empty_dashboards
-  description: Total number of dashboards with no items
+  description: Total number of dashboards with no items.
   section: Dashboards
   section_order: 4
   summary_uid: mQ8XfW10fOQ
@@ -42,9 +42,8 @@
        dashboardid not in (select dashboardid from dashboard_items);
   severity: INFO
   introduction: >
-    All dashboards should have content on them.
-    Dashboards without any content do not serve any purpose,
-    and may have been created by accident or as part of a training exercise.
+    All dashboards should have content on them. Dashboards without any content do not 
+    serve any purpose, and can make it more difficult to find relevant dashboard with content.
   recommendation: >
-    Dashboards without content that have not
-    been modified in the last 14 days can be removed.
+    Dashboards without content that have not been modified in the last e.g. 14 days should
+    be considered for deletion.
