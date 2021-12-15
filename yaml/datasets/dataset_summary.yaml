@@ -27,7 +27,7 @@
 ---
   summary_uid: SdTkaAOPwFM
   name: dataset_summary
-  description: Total number of data sets
+  description: Total number of data sets.
   section: Datasets
   section_order: 1
   summary_sql: >-

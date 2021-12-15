@@ -26,7 +26,7 @@
 #
 ---
   name: indicator_nongrouped
-  description: Indicators not in any groups
+  description: Indicators not in any groups.
   section: Indicators
   section_order: 2
   summary_uid: yh9JEFsml2C
@@ -45,12 +45,10 @@
     ORDER BY name;
   severity: WARNING
   introduction: >
-    All indicators should be in an indicator group.
-    This allows users to find the indicators more easily
-    in analysis apps and also contributes to having more complete indicators group sets.
-    Maintenance operations can
-    also be made more efficient by applying bulk settings (ex. sharing, filtering)
-    to all indicators within an indicator group.
+    All indicators should be in an indicator group. This allows users to find the indicators 
+    more easily in analysis apps and also contributes to having more complete indicators
+    group sets. Maintenance operations can also be made more efficient by applying bulk
+    settings (ex. sharing, filtering) to all indicators within an indicator group.
   recommendation: >
     Indicators that are not in a indicator group should be added to a relevant indicator group.
     If the indicators are not needed, they should be deleted.
