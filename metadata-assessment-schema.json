@@ -50,6 +50,11 @@
     "recommendation": {
         "description": "This field should describe the procedure to rectify the problems",
         "type": "string"
+    },
+    "is_protected" : {
+        "description": "Flag to indicate whether the query accesses protected tables. These queries cannot be accessed via the API",
+        "type" : "boolean",
+        "default" : false
     }
 
   },
