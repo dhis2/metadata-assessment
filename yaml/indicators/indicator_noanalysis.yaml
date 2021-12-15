@@ -26,7 +26,7 @@
 #
 ---
   name: indicator_noanalysis
-  description: Indicators not used in favourites
+  description: Indicators not used in analytical objects.
   section: Indicators
   section_order: 4
   summary_uid: sgBuVm7KhJC
@@ -48,13 +48,12 @@
     ORDER BY name;
   severity: WARNING
   introduction: >
-    All indicators that are calculated should be used to produce some type of analysis output (charts, maps, tables).
-    This can be by using them directly in an output or providing direct feedback in a dataset.
+    Indicators should be used to produce some type of analysis output (charts, maps, tables).
+    Note: this check does not include indicators used in datasets to provide feedback
+    during data entry.
   recommendation: >
-    Indicators that are not routinely being reviewed in analysis,
-    either in an output or data set, should be reviewed to determine
-    if they still need to be calculated.
-    If these are meant to be used for routine review, then associated outputs should be created using them.
-    If these indicators are
-    not going to be used for any type of information review,
-    consideration should be made to either archive them or delete them.
+    Indicators that are not routinely being reviewed in analysis should be reviewed to
+    determine if they are useful and needed. If these are meant to be used for routine 
+    review, then associated outputs should be created using them. If these indicators are
+    not going to be used for any type of information review, and are not used in data sets,
+    consideration should be made to either archive or delete them.

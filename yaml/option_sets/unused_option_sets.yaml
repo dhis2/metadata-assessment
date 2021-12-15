@@ -27,7 +27,7 @@
 ---
   summary_uid: X1oWESZRTzY
   name: options_sets_unused
-  description: Ununsed option sets
+  description: Ununsed option sets.
   section: Option sets
   section_order: 2
   summary_sql: >-
