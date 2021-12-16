@@ -1,0 +1,88 @@
+# Copyright (c) 2021, University of Oslo
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# Redistributions of source code must retain the above copyright notice, this
+# list of conditions and the following disclaimer.
+#
+# Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+# Neither the name of the HISP project nor the names of its contributors may
+# be used to endorse or promote products derived from this software without
+# specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+# ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+---
+  summary_uid: zKs07PBTuXM
+  name: orgunitgroupset_excess_groups
+  description: Organisation units which belong to multiple groups in a group set.
+  section: Organisation units
+  section_order: 10
+  summary_sql: >-
+    with orgunitgroupset_excess_groups as (
+    select * from (
+    select ou.name as ouname,
+    ou.uid as ou_uid,
+    oug.name as ougroupname,
+    oug.uid as ougroup_uid,
+    ougs.name as ougroupsetname,
+    ougs.uid as ougroupset_uid,
+    ( select count(*)
+    from orgunitgroupmembers ougm2
+    inner join orgunitgroupsetmembers ousm2 on ougm2.orgunitgroupid=ousm2.orgunitgroupid
+    where ougm2.organisationunitid=ougm.organisationunitid
+    and ousm2.orgunitgroupsetid=ousm.orgunitgroupsetid) as membercount
+    from orgunitgroupmembers ougm
+    inner join organisationunit ou on ougm.organisationunitid=ou.organisationunitid
+    inner join orgunitgroup oug on ougm.orgunitgroupid=oug.orgunitgroupid
+    inner join orgunitgroupsetmembers ousm on ougm.orgunitgroupid=ousm.orgunitgroupid
+    inner join orgunitgroupset ougs on ousm.orgunitgroupsetid=ougs.orgunitgroupsetid
+    order by membercount desc, ou.name, oug.name, ougs.name ) as ous
+    where membercount > 1 )
+    select 'orgunitgroupset_excess_groups' as indicator,
+    count(*)::varchar as value,
+    (100*(SELECT DISTINCT COUNT(ou_uid) FROM orgunitgroupset_excess_groups)
+    /(select count(*) from organisationunit)) || '%' as percent,
+    'Organisation units which belong to multiple groups in a group set' as description
+    from orgunitgroupset_excess_groups;
+  details_uid: dmCuiWwo4KL
+  details_sql: >-
+    select * from (
+    select ou.name as ouname,
+    ou.uid as ou_uid,
+    oug.name as ougroupname,
+    oug.uid as ougroup_uid,
+    ougs.name as ougroupsetname,
+    ougs.uid as ougroupset_uid,
+    ( select count(*)
+    from orgunitgroupmembers ougm2
+    inner join orgunitgroupsetmembers ousm2 on ougm2.orgunitgroupid=ousm2.orgunitgroupid
+    where ougm2.organisationunitid=ougm.organisationunitid
+    and ousm2.orgunitgroupsetid=ousm.orgunitgroupsetid) as membercount
+    from orgunitgroupmembers ougm
+    inner join organisationunit ou on ougm.organisationunitid=ou.organisationunitid
+    inner join orgunitgroup oug on ougm.orgunitgroupid=oug.orgunitgroupid
+    inner join orgunitgroupsetmembers ousm on ougm.orgunitgroupid=ousm.orgunitgroupid
+    inner join orgunitgroupset ougs on ousm.orgunitgroupsetid=ougs.orgunitgroupsetid
+    order by membercount desc, ou.name, oug.name, ougs.name ) as ous
+    where membercount > 1;
+  severity: SEVERE
+  introduction: >
+      Organisation units should belong to exactly one group within each organisation
+      unit group set of which they are a member. If the organisation unit belongs to
+      multiple groups, this will lead to unpredictable results in analysis.
+  recommendation: >
+     Using the maintenance app, assign the organisation units in the details list
+     to exactly one group within each group set membership.
