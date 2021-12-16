@@ -40,7 +40,7 @@
     FROM program_rules_no_priority;
   details_uid: tHtxIYabJze
   details_sql: >-
-    SELECT uid,name from programrule where prirority IS NULL;
+    SELECT uid,name from programrule where priority IS NULL;
   severity: SEVERE
   introduction: >
     All program rules should be assigned a priority.
