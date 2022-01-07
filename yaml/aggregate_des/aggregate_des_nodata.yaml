@@ -49,7 +49,6 @@
     Data elements should generally always be associated with data values.
     If data elements exist in a data set which is active, but there are no
     data values associated with them, they may not be part of the data entry
-    screens. Another possibility is that they simply do have have any data
-    at all, because users are unable to be reported on.
+    screens.
   recommendation: >
     Consider removing data elements with no data values.

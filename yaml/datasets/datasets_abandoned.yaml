@@ -50,9 +50,10 @@
   introduction: >
      Datasets should generally be assigned to multiple organisation units if they are used,
      or be modified recently (e.g. last 100 days) if they are under development. Unused 
-     datasets represent unnecessary clutter in the database and confuse users and 
+     datasets represent unnecessary clutter in the database and may confuse users and 
      administrators. The exception is data sets which are associated with historical data, 
-     for example reporting forms from previous years which are no longer used.
+     for example reporting forms from previous years which are no longer used, and datasets
+     that is designed to be used in only on organisation unit (e.g. at national level).
   recommendation: >
      Datasets which are not activly used or in development should be removed from the 
      system to decrease system clutter and metadata size. Before removing the data sets,
