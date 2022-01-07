@@ -59,8 +59,12 @@
     ORDER BY name;
   severity: WARNING
   introduction: >
-    Data elements that have not been recently updated
-    with data values should consider to be deallocated from datasets.
-    The criteria for inactive data elements  has been defined as data elements
-     with no new values in the last 3 periods based on the data set period type
-     associated with those data elements)
+    Data elements with no recent data values are likely to fall into one of two
+    categories: 1) they have been used previously and hold useful/relevant data, 2)
+    they have not been used in any meaningful way (e.g. data values stem from testing
+    during configuration or a small pilot) and the data is not useful/relevant.
+  recommendation: >
+    If the data elements hold useful historical data, they should be kept. Consider
+    renaming the data elements and/or data sets to make it clear they are not used
+    for data collection any more. Data elements which are not actively used and have
+    no valueable data associated 

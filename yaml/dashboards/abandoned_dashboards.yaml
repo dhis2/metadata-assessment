@@ -49,14 +49,14 @@
    ORDER BY name;
   severity: WARNING
   introduction: >
-      In many cases users may create dashboards during trainings, for temporary purposes
-      or become inactive users. This may leave many abandoned dashboards in the system.
-      Ideally, these should be removed if they are no longer needed in order to keep the
-      system tidy.
+    Dashboards that are not viewed by users can indicate limited data use, that 
+    the dashboards have not been designed with an intention of reuse (for example
+    as part of a training exersice or one-off data analysis), or that the user owning
+    the dashboard is not longer active.
   recommendation: >
-      Users with superuser permission should be able to delete dashboards directly
-      by looking up the name. Of course, a determination should be made if the dashboard
-      really is no longer in use before they are deleted. For large number of deletions,
-      you may need to use a script to delete them through the API. You should also
-      confirm that the dashboard is not in use by any push analysis before removing
-      it from the system.
+    If the dashboards are relevant and useful but not view, efforts should be made 
+    to increase data use (e.g. review sharing settings, communicate with users, 
+    plan training exercises etc). In other cases, users with superuser permission 
+    should be able to delete dashboards by looking up the name or in batches.
+    You should also confirm that the dashboard is not in use by any push analysis
+    before removing it from the system.
