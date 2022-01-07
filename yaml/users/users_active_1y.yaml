@@ -44,9 +44,11 @@
     AND disabled = FALSE;
   severity: WARNING
   introduction: >
-    All users should log in routinely. The definition of "routine" may vary between
-    implementations and therefore you can assess this
-    over both the last 12 months as well as a pre-defined period of your choosing.
+    Only users who routinely access the system should have active user accounts. Users who
+    have not logged in the last year may not use or need access to the system, they may
+    have left their position and should, or the account may be the result of an invitation
+    to register an account that has not been used.
   recommendation: >
-    Information only.
+    User accounts that are not associated with real, active users should as a minimum be
+    disabled, alternatively deleted.
   is_protected : TRUE
