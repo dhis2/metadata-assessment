@@ -136,7 +136,12 @@ getSQLView <- function(uid,d2_session) {
                      handle=d2_session,
                      timeout(600)) ,
                  error = function(e) print(e) )
-   
+  
+  if (is.null(r)) {
+    print(paste("ERROR! View", uid, "did not respond in time."))
+    return(NULL)
+  }
+  
   if (r$status_code != 200L) {
     print(paste("ERROR! View", uid, "could not be executed on the server"))
     return(NULL)
