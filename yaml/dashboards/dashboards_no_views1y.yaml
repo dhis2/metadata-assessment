@@ -50,13 +50,14 @@
      GROUP BY favoriteuid);
   severity: WARNING
   introduction: >
-    All dashboards should be reviewed routinely. Dashboards that are no longer viewed 
-    routinely are not being used, or potentially being used incorrectly. The definition of
-    "routine" may vary between implementations and therefore you can assess this over both 
-    the last 12 months (default) as well as a pre-defined period of your choosing.
+    Dashboards that are not viewed by users can indicate limited data use, that 
+    the dashboards have not been designed with an intention of reuse (for example
+    as part of a training exersice or one-off data analysis), or that the user owning
+    the dashboard is not longer active.
   recommendation: >
-    Dashboards that should be reviewed routinely and are not point to a broader data use
-    issue that will not be addressed by technical means. Such dashboards may need to be 
-    kept while a process for reviewing them more frequently becomes more well defined. Such
-    unused dashboards may also be, for example, private dashboards for users who are no 
-    longer active.
+    If the dashboards are relevant and useful but not view, efforts should be made 
+    to increase data use (e.g. review sharing settings, communicate with users, 
+    plan training exercises etc). In other cases, users with superuser permission 
+    should be able to delete dashboards by looking up the name or in batches.
+    You should also confirm that the dashboard is not in use by any push analysis
+    before removing it from the system.

@@ -70,16 +70,12 @@
     periodid from datavalue) group by datasetid);
   severity: WARNING
   introduction: >
-    All active datasets should have data values associated with them.
-    Active data sets are data sets which should be currently used
-    (this is defined as within the last 3 reporting periods) to collect data.
-  recommendation: |
-    * If a data set is not being updated with new data or no new data values
-    are being entered within the last 3 periods (relative to the period type
-    assigned to the dataset ex. monthly will be the last 3 months, quarterly the last 3 quarters)
-    against the dataset but there are data values from previous periods the data set
-    should be archived (ie. assign it a prefix)
-
-    * If a data set has no new or previous data values within the last 3
-    periods (relative to the period type assigned to the dataset) and will
-    not be used to collect data, the data set should be removed.
+    Data sets with no recent data values associated with them are likely to fall into one
+    of two categories: 1) they have been used previously and hold useful/relevant data, 2)
+    they have not been used in any meaningful way (e.g. data values stem from testing
+    during configuration or a small pilot) and the data is not useful/relevant.
+  recommendation: >
+    If the data elements hold useful historical data, they should be kept. Consider
+    renaming the data elements and/or data sets to make it clear they are not used
+    for data collection any more. Data elements which are not actively used and have
+    no valueable data associated
