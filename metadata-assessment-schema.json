@@ -55,8 +55,12 @@
         "description": "Flag to indicate whether the query accesses protected tables. These queries cannot be accessed via the API",
         "type" : "boolean",
         "default" : false
+    },
+    "is_slow" : {
+        "description": "Flag to indicate whether the query has the potential to take a long time to execute. By default, these will be excluded.",
+        "type" : "boolean",
+        "default" : false
     }
-
   },
 "required": [
     "name",
