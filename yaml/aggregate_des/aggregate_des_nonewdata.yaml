@@ -67,4 +67,5 @@
     If the data elements hold useful historical data, they should be kept. Consider
     renaming the data elements and/or data sets to make it clear they are not used
     for data collection any more. Data elements which are not actively used and have
-    no valueable data associated 
+    no valueable data associated. 
+  is_slow: TRUE
