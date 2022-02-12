@@ -25,25 +25,31 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ---
-  summary_uid: xL9ClsJAhx2
-  name: program_rules_no_priority
-  description: Program rules with no priority.
-  section: Program rules
-  section_order: 2
+  summary_uid: GM2hzHGbp14
+  name: catcombos_no_categories
+  description: Category combinations with no categories.
+  section: Categories
+  section_order: 7
   summary_sql: >-
-    WITH program_rules_no_priority as (
-    SELECT uid,name from programrule where priority IS NULL )
-    SELECT 'program_rules_no_priority' as indicator,
+    WITH catcombos_no_category  AS (
+    SELECT uid,name FROM categorycombo
+    WHERE categorycomboid NOT IN (SELECT DISTINCT categorycomboid
+    FROM categorycombos_categories))
+    SELECT 'catcombos_no_category' as indicator,
     COUNT(*)::varchar as value,
-    ROUND( (100.0 * COUNT(*) / (SELECT COUNT(*) FROM programrule))) || '%' as percent,
-    'Program rules with no priority.' as description
-    FROM program_rules_no_priority;
-  details_uid: tHtxIYabJze
+    ROUND( 100.0 * COUNT(*) / (SELECT COUNT(*)
+    FROM categorycombo) ) || '%' as percent,
+    'Category combinations with no categories.' as description
+    FROM catcombos_no_category;
+  details_uid: jb6a7eA0FyT
   details_sql: >-
-    SELECT uid,name from programrule where priority IS NULL;
-  severity: SEVERE
+    SELECT uid,name FROM categorycombo
+    WHERE categorycomboid NOT IN (SELECT DISTINCT categorycomboid
+    FROM categorycombos_categories);
+  severity: WARNING
   introduction: >
-    All program rules should be assigned a priority.
+    All category combinations should be associated with one or more categories.
   recommendation: >
-    Using the DHIS2 user interface, assign a priority to each of the program rules
-    which is missing one.
+    Category combinations without categories are not usable by DHIS2. They should
+    either be removed or the correct cateogries should be added to the category
+    combo.
