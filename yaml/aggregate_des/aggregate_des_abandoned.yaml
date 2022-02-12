@@ -53,7 +53,8 @@
     associated with them. Often, these are the result of new or changed
     configurations that have been abandonded at some point.
   recommendation: >
-    Data elements that have no data associated with them and which there are no
-    plans to start using for data collection should be deleted.
+    Data elements that have no data associated with them and which there are no plans
+    to start using for data collection should be deleted.
+  is_slow: true
 
 

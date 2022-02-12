@@ -25,10 +25,11 @@ source("R/utils.R")
 baseurl <- Sys.getenv("baseurl")
 username <- Sys.getenv("username")
 password <- Sys.getenv("password")
+include_slow <- ifelse(Sys.getenv("include_slow") == "TRUE",TRUE,FALSE)
 
-views <- transformYAMLtoControlFile()
+views <- transformYAMLtoControlFile(include_protected = FALSE,include_slow = include_slow)
 
-metadata <- transformYAMLtoMetadata()
+metadata <- transformYAMLtoMetadata(include_protected = FALSE,include_slow = include_slow)
 
 #Login to the server
 d2_session <- httr::handle(baseurl)

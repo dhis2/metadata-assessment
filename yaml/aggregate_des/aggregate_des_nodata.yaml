@@ -52,3 +52,4 @@
     screens.
   recommendation: >
     Consider removing data elements with no data values.
+  is_slow: TRUE

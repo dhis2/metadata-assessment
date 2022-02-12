@@ -57,12 +57,14 @@ transformYAMLtoJSON <- function(filepath) {
 
 }
 
-transformYAMLtoControlFile<-function(include_protected = FALSE) {
+transformYAMLtoControlFile<-function(include_protected = FALSE, include_slow = FALSE) {
   all_yaml_files<-list.files("yaml/",pattern="*.yaml",recursive = TRUE,full.names = TRUE)
 
   d <- purrr::map_dfr(all_yaml_files, yaml::read_yaml) %>%
     dplyr::mutate(is_protected = dplyr::case_when(is.na(is_protected) ~ FALSE,
     TRUE ~ is_protected))  %>%
+    dplyr::mutate(is_slow = dplyr::case_when(is.na(is_slow) ~ FALSE,
+                                                  TRUE ~ is_slow))  %>%
     dplyr::arrange(section,section_order)
 
   dups <-  d %>% dplyr::select(name,description,summary_uid,details_uid) %>%
@@ -83,12 +85,16 @@ transformYAMLtoControlFile<-function(include_protected = FALSE) {
  if (!include_protected) {
    d <- d  %>% dplyr::filter(!is_protected)
  }
+  
+ if (!include_slow) {
+   d <- d %>% dplyr::filter(!is_slow)
+ }
 
   return(d)
 }
 
-transformYAMLtoMetadata <- function(include_protected=FALSE) {
- r <- transformYAMLtoControlFile(include_protected)
+transformYAMLtoMetadata <- function(include_protected=FALSE,include_slow = FALSE) {
+ r <- transformYAMLtoControlFile(include_protected,include_slow)
 
  sql_views <- list()
  for (i in seq_len(NROW(r))) {
@@ -136,7 +142,12 @@ getSQLView <- function(uid,d2_session) {
                      handle=d2_session,
                      timeout(600)) ,
                  error = function(e) print(e) )
-   
+  
+  if (is.null(r)) {
+    print(paste("ERROR! View", uid, "did not respond in time."))
+    return(NULL)
+  }
+  
   if (r$status_code != 200L) {
     print(paste("ERROR! View", uid, "could not be executed on the server"))
     return(NULL)
