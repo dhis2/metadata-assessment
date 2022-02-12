@@ -49,8 +49,9 @@
   severity: WARNING
   introduction: >
     "Abandoned" data elements. These are data elements that have not
-    been updated in at least 100 days and do not have any data values
-    associated with them.
+    been modified in at least 100 days and do not have any data values
+    associated with them. Often, these are the result of new or changed
+    configurations that have been abandonded at some point.
   recommendation: >
     Data elements that have no data associated with them and which there are no plans
     to start using for data collection should be deleted.
