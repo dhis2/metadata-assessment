@@ -72,7 +72,7 @@ transformYAMLtoControlFile<-function(include_protected = FALSE, include_slow = F
     dplyr::mutate(has = rowSums(.) > 0) %>% 
     purrr::set_names(paste0(names(.),"_dup"))
   
-  if ( any(dups) ) {
+  if ( any(colSums(dups)!=0) ) {
     duplicates <- d %>%
       dplyr::select(name,description,summary_uid,details_uid) %>% 
       dplyr::bind_cols(dups) %>% 
