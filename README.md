@@ -52,7 +52,8 @@ the particular issue. Each query should return four columns and one row.
 - *details_sql*: An SQL query which should return one or more rows of all 
 metadata objects which violate this particular metadata check. At the very least,
 the query should consist of the UID and name of the object, and in certain cases
-may contain other fields which will make the identification of the specific object easier in order to rectify the problem. 
+may contain other fields which will make the identification of the specific object easier in order to rectify the problem.
+- *is_slow*: Whether the query is potentially long-running/slow, typically because it queries against the datavalue table.
 - *severity*: This field is used to indicate the overall severity of a particular problem. 
     - INFO: Indicates that this is for information only.
     - WARNING: A warning indicates that this may be a problem, but not 
@@ -120,8 +121,10 @@ this on a shared computer environment.
 of the report will be deleted after the report completes.
 - *dhis2_checks*: If set to `TRUE`, results from the DHIS2 data integrity
 checks will also be integrated into the report. Please take note, that 
-these integrity checks may take a very long time to run on larger databases. 
-
+these integrity checks may take a very long time to run on larger databases.
+- *include_slow*: If set to `TRUE`, checks that potentially take a long time
+to complete on large databases will also be included. This includes, for example, 
+checks that involve queries against the `datavalues` table.
 
 Once you have completed each of these steps, open up the file `dhis2_metadata_assessment.Rmd`
 in RStudio. Press the "Knit" button, and wait for the report to complete. The report 
