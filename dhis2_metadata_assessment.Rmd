@@ -118,7 +118,7 @@ DT::datatable(results_table,escape = FALSE)
 ```{r users, echo=FALSE,message=FALSE}
 
 url <- paste0(d2_session$url,"api/users?paging=false&fields=id,organisationUnits[level],userCredentials[userRoles[authorities],lastLogin,disabled]")
-r <-httr::GET(url,content_type_json(),handle=d2_session) %>% 
+r <-httr::GET(url,content_type_json(),handle=d2_session,timeout(600)) %>% 
   httr::content(.,"text") %>% 
   jsonlite::fromJSON()
 
