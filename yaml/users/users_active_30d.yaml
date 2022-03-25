@@ -53,7 +53,5 @@
     to view analyses. This metric measures the number of users
     who are enabled, but have not logged in during the past 30 days.
   recommendation: >
-    Lorem ipsum dolor sit amet, habitasse purus, praesent
-    pretium orci mauris a velit feugiat.
-    Malesuada et rutrum, ullamcorper in ut in potenti.
+    Review if these users should be active, otherwise consider disabling the accounts.
   is_protected : TRUE
