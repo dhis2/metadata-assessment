@@ -106,6 +106,7 @@ Sys.setenv(username="admin")
 Sys.setenv(password="district")
 Sys.setenv(cleanup_views = FALSE)
 Sys.setenv(dhis2_checks = TRUE)
+Sys.setenv(include_slow = FALSE)
 ```
 
 You should replace each of the variables with your particular details. 
