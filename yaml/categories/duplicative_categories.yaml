@@ -32,38 +32,41 @@
   section_order: 10
   summary_sql: >-
     WITH duplicative_categories  AS (
-    SELECT catoptions,COUNT(*) as count
+    SELECT catoptions, COUNT(*) as count
     FROM ( SELECT categoryid,
     array_agg(categoryoptionid ORDER BY categoryoptionid) as catoptions
     FROM categories_categoryoptions group by categoryid) as foo
     GROUP BY catoptions HAVING COUNT(*) > 1
     )
     SELECT 'duplicative_categories' as indicator,
-    count::varchar as value,
-    ROUND( 100.0 * count / (SELECT COUNT(*)
+    COUNT(*)::varchar as value,
+    ROUND( 100.0 * COUNT(*) / (SELECT COUNT(*)
     FROM dataelementcategory) ) || '%' as percent,
     'Categories with the same category options' as description
     FROM duplicative_categories;
   details_uid: yKInwm9p54H
   details_sql: >-
-    WITH duplicated_categories AS (
-    SELECT catoptions,COUNT(*)
+    SELECT x.uid,'(' || b.rank || ') ' || x.name  from dataelementcategory x
+    INNER JOIN (
+    SELECT categoryid, array_agg(categoryoptionid ORDER BY categoryoptionid) as catoptions
+    from categories_categoryoptions GROUP BY categoryid
+    ) a on x.categoryid = a.categoryid
+    INNER JOIN (
+    SELECT catoptions, COUNT(*) as count, DENSE_RANK() OVER (ORDER BY catoptions) as rank
     FROM ( SELECT categoryid,
     array_agg(categoryoptionid ORDER BY categoryoptionid) as catoptions
     FROM categories_categoryoptions group by categoryid) as foo
-    GROUP BY catoptions HAVING COUNT(*) > 1)
-    SELECT uid,name from dataelementcategory where categoryid in (
-    SELECT a.categoryid  from (
-    SELECT categoryid,
-    array_agg(categoryoptionid ORDER BY categoryoptionid) as catoptions
-    from categories_categoryoptions GROUP BY categoryid ) a
-    INNER JOIN duplicated_categories
-    ON  duplicated_categories.catoptions = a.catoptions);
+    GROUP BY catoptions HAVING COUNT(*) > 1
+    ) b on b.catoptions = a.catoptions
+    ORDER BY b.rank
   severity: WARNING
   introduction: >
     Categories with the exact same category options should be considered
-    to be merged. Categoriesw with the exact same category options
-    may be easily confused by users in analysis.
+    to be merged. Categories with the exact same category options
+    may be easily confused by users in analysis. The details view will
+    provide a list of categories which have the exact same category options.
+    For each duplicated category a number in parantheses such as (1) will
+    indicate which categories belong to duplicated groups.
   recommendation: |
     If category combinations have already been created with duplicative categories,
     it is recommended that you do not take any action, but rather ensure
