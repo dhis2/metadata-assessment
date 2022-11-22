@@ -72,9 +72,22 @@ checkVersion <- function(dhis2_version=getDHIS2Version()) {
 
 summary_views <- views$summary_uid
 
- results <- purrr::map_dfr(views$summary_uid, function(x)  getSQLView(x, d2_session = d2_session))
+results <- purrr::map(views$summary_uid, function(x)  getSQLView(x, d2_session = d2_session))
  
-results_table <- results %>% 
+#Separate the results
+#Errors 
+errored_out <- unlist(lapply(results, function(x) all(class(x) == "list")))
+
+results_with_errors <- results[errored_out] %>% 
+  do.call("rbind.data.frame",. ) %>% 
+  dplyr::left_join(views[,c("summary_uid","section","description")] , by =c("uid" = "summary_uid")) %>% 
+  dplyr::select("Check" = description,
+                "Message" = message)
+
+results_with_data <- do.call("rbind.data.frame",results[!errored_out])
+ 
+ 
+results_table <- results_with_data %>% 
   dplyr::left_join(views[,c("summary_uid","section","section_order","details_uid","severity")] , by =c("uid"="summary_uid")) %>% 
   dplyr::arrange(section,section_order) %>%
   dplyr::mutate(
@@ -97,9 +110,17 @@ results_table <- results %>%
 if (Sys.getenv("cleanup_views") == TRUE) {
   r <- deleteMetadata(metadata, d2_session)
 }
+```
 
+## Checks which could not be executed
+```{r checks_with_errors, echo=FALSE,message=FALSE}
+DT::datatable(results_with_errors, escape =  FALSE)
+```
+
+
+```{r checks_with_results, echo=FALSE,message=FALSE}
+# Metadata checks
 DT::datatable(results_table,escape = FALSE)
-
 ```
 
 ## Users
@@ -166,7 +187,7 @@ and expiation of each of the checks.
 
 ```{r guidance, echo=FALSE,message=FALSE,results="asis"}
 
-guidance <- results %>% 
+guidance <-  results_with_data %>% 
   dplyr::left_join(views[,c("summary_uid","section","section_order","details_uid","severity","introduction","recommendation")] , by =c("uid"="summary_uid")) %>% 
   dplyr::arrange(section,section_order) %>%
   dplyr::mutate(details = paste0("<a href='",
