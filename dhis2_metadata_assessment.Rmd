@@ -66,26 +66,32 @@ checkVersion <- function(dhis2_version=getDHIS2Version()) {
 
 # Target server: `r baseurl`
 
-## Metadata issues
 
 ```{r sql_view_results, echo=FALSE,message=FALSE,results="asis"}
 
 summary_views <- views$summary_uid
 
+results <- purrr::map(views$summary_uid, function(x)  getSQLView(x, d2_session = d2_session))
+ 
+#Separate the results
+#Errors 
+errored_out <- unlist(lapply(results, function(x) all(class(x) == "list")))
 
-results <- data.frame(indicator = character(),
-                      value = character(),
-                      percent = character(),
-                      description = character(),
-                      stringsAsFactors = FALSE)
-
-for (uid in summary_views) {
-  r <- getSQLView(uid,d2_session = d2_session)
-  results <- dplyr::bind_rows(r,results)
+if (any(errored_out)) {
+results_with_errors <- results[errored_out] %>% 
+  do.call("rbind.data.frame",. ) %>% 
+  dplyr::left_join(views[,c("summary_uid","section","description")] , by =c("uid" = "summary_uid")) %>% 
+  dplyr::select("Check" = description,
+                "Message" = message)  
+} else {
+  results_with_errors <- data.frame(message="All checks ran successfu")
 }
 
 
-results_table <- results %>% 
+results_with_data <- do.call("rbind.data.frame",results[!errored_out])
+ 
+ 
+results_table <- results_with_data %>% 
   dplyr::left_join(views[,c("summary_uid","section","section_order","details_uid","severity")] , by =c("uid"="summary_uid")) %>% 
   dplyr::arrange(section,section_order) %>%
   dplyr::mutate(
@@ -108,10 +114,23 @@ results_table <- results %>%
 if (Sys.getenv("cleanup_views") == TRUE) {
   r <- deleteMetadata(metadata, d2_session)
 }
-
-DT::datatable(results_table,escape = FALSE)
-
 ```
+
+
+## Metadata issues 
+
+```{r checks_with_results, echo=FALSE,message=FALSE}
+# Metadata checks
+DT::datatable(results_table,escape = FALSE)
+```
+
+
+## Checks which could not be run
+
+```{r checks_with_errors, echo=FALSE,message=FALSE}
+DT::datatable(results_with_errors, escape =  FALSE)
+```
+
 
 ## Users
 
@@ -123,11 +142,20 @@ r <-httr::GET(url,content_type_json(),handle=d2_session,timeout(600)) %>%
   jsonlite::fromJSON()
 
 n_users <-  length(r$users$id)
+
 last_logins <- strptime(r$users$userCredentials$lastLogin,"%Y-%m-%dT%H:%M:%S") 
-last_login_age <- difftime(Sys.time(),last_logins,units="days")
+
+last_login_age <- last_logins %>% 
+  lapply(., function(x) x[!is.na(x)]) %>% 
+  lapply(., function(x) difftime(Sys.time(), x ,units="days"))
+
+
 user_disabled <- r$users$userCredentials$disabled
+
 user_levels <- r$users$organisationUnits
+
 users_roles <- r$users$userCredentials$userRoles
+
 user_has_super <- unlist(lapply(lapply(users_roles, function(x) stringr::str_detect(unlist(x),"^ALL$")),any))
 
 
@@ -139,7 +167,7 @@ user_has_super <- unlist(lapply(lapply(users_roles, function(x) stringr::str_det
 - Total users logged in within 30 days: `r sum(last_login_age <= 30,na.rm = TRUE)`
 - Total users logged in within 90 days: `r sum(last_login_age <= 90,na.rm = TRUE)`
 - Total users logged in within a year: `r sum(last_login_age <= 365,na.rm = TRUE)`
-- Users who have never logged in: `r sum(is.na(last_login_age))`
+- Users who have never logged in: `r sum(is.na(last_logins))`
 - Percentage of users who are disabled: `r round(sum(user_disabled)/length(user_disabled) * 100.0)` %
 - Number of users who have superuser: `r sum(user_has_super)`
 - Percentage of users who have superuser: `r round( sum(user_has_super)/ n_users * 100.0)` %
@@ -177,7 +205,7 @@ and expiation of each of the checks.
 
 ```{r guidance, echo=FALSE,message=FALSE,results="asis"}
 
-guidance <- results %>% 
+guidance <-  results_with_data %>% 
   dplyr::left_join(views[,c("summary_uid","section","section_order","details_uid","severity","introduction","recommendation")] , by =c("uid"="summary_uid")) %>% 
   dplyr::arrange(section,section_order) %>%
   dplyr::mutate(details = paste0("<a href='",

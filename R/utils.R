@@ -68,14 +68,14 @@ transformYAMLtoControlFile<-function(include_protected = FALSE, include_slow = F
     dplyr::arrange(section,section_order)
 
   dups <-  d %>% dplyr::select(name,description,summary_uid,details_uid) %>%
-    dplyr::mutate_all(function(x) duplicated(x)) %>% 
-    dplyr::mutate(has = rowSums(.) > 0) %>% 
+    dplyr::mutate_all(function(x) duplicated(x)) %>%
+    dplyr::mutate(has = rowSums(.) > 0) %>%
     purrr::set_names(paste0(names(.),"_dup"))
-  
+
   if ( any(colSums(dups)!=0) ) {
     duplicates <- d %>%
-      dplyr::select(name,description,summary_uid,details_uid) %>% 
-      dplyr::bind_cols(dups) %>% 
+      dplyr::select(name,description,summary_uid,details_uid) %>%
+      dplyr::bind_cols(dups) %>%
       dplyr::filter(has_dup > 0)
     print(duplicates)
     stop("Duplicates found!")
@@ -85,7 +85,7 @@ transformYAMLtoControlFile<-function(include_protected = FALSE, include_slow = F
  if (!include_protected) {
    d <- d  %>% dplyr::filter(!is_protected)
  }
-  
+
  if (!include_slow) {
    d <- d %>% dplyr::filter(!is_slow)
  }
@@ -122,13 +122,13 @@ transformYAMLtoMetadata <- function(include_protected=FALSE,include_slow = FALSE
    this_row <- list(summary_sql,details_sql)
    sql_views <- append(this_row,sql_views)
  }
- 
+
  list(sqlViews=sql_views)
- 
+
 }
 
-getSQLView <- function(uid,d2_session) {
-  
+getSQLView <- function(uid, d2_session) {
+
   # #Execute the view first to be sure its fresh
   # url <- paste0(d2_session$url,"api/sqlViews/",uid,"/execute")
   # r <- httr::POST(url,content_type_json(), handle = d2_session)
@@ -136,41 +136,46 @@ getSQLView <- function(uid,d2_session) {
   #   warning(paste0("Could not execute view ",uid))
   #   return(data.frame())
   # }
-  
-   
-  r <- tryCatch( httr::GET(paste0(d2_session$url,"api/sqlViews/",uid,"/data.csv"), 
+
+
+  r <- tryCatch( httr::GET(paste0(d2_session$url,"api/sqlViews/",uid,"/data.csv"),
                      handle=d2_session,
                      timeout(600)) ,
                  error = function(e) print(e) )
-  
+
   if (is.null(r)) {
     print(paste("ERROR! View", uid, "did not respond in time."))
     return(NULL)
   }
-  
-  if (r$status_code != 200L) {
-    print(paste("ERROR! View", uid, "could not be executed on the server"))
-    return(NULL)
+
+  if (r$status_code == 500L) {
+    return( list(
+      uid = uid,
+      response_code = r$status_code,
+      message = httr::content(r)$message
+    ) )
   }
-   
-   r %>% 
-    httr::content("text") %>% 
-    { # nolint
-      suppressWarnings(readr::read_csv(
-        .,
-        col_names = TRUE,
-        col_types = readr::cols(
-          .default = "c"
-        )
-      ))
-    } %>% 
-    dplyr::mutate(uid = uid)
-  
+
+  if (r$status_code == 200L) {
+    r %>%
+      httr::content("text") %>%
+      { # nolint
+        suppressWarnings(readr::read_csv(
+          .,
+          col_names = TRUE,
+          col_types = readr::cols(
+            .default = "c"
+          )
+        ))
+      } %>%
+      dplyr::mutate(uid = uid)
+  }
+
 }
 
 getDetailsUID <- function(name,views) {
   new_name <- stringr::str_replace(name,"_S","_D")
-  dplyr::filter(views,name == new_name) %>% 
+  dplyr::filter(views,name == new_name) %>%
     dplyr::pull(id)
 }
 
