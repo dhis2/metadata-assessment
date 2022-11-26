@@ -3,10 +3,10 @@ title: "DHIS2 Metadata Assessment"
 author: "DHIS2 Implementation Team"
 date: "`r Sys.Date()`"
 output:
+  word_document: default
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
-  word_document: default
 always_allow_html: yes
 ---
   
@@ -79,16 +79,19 @@ errored_out <- unlist(lapply(results, function(x) all(class(x) == "list")))
 
 if (any(errored_out)) {
 results_with_errors <- results[errored_out] %>% 
-  do.call("rbind.data.frame",. ) %>% 
-  dplyr::left_join(views[,c("summary_uid","section","description")] , by =c("uid" = "summary_uid")) %>% 
-  dplyr::select("Check" = description,
-                "Message" = message)  
+  purrr::map_df(flatten) %>% 
+  dplyr::left_join(views[,c("summary_uid","section","description")] , by =c("uid" = "summary_uid"))
+
+
+
+
 } else {
   results_with_errors <- data.frame(message="All checks ran successfu")
 }
 
 
-results_with_data <- do.call("rbind.data.frame",results[!errored_out])
+results_with_data <- results[!errored_out] %>% 
+  purrr::map_df(flatten)
  
  
 results_table <- results_with_data %>% 
