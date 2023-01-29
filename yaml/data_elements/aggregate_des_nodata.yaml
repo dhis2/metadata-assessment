@@ -25,29 +25,40 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ---
-name: indicators_not_grouped
-description: Indicators not in any groups.
-section: Indicators
-section_order: 2
-summary_uid: yh9JEFsml2C
+name: data_elements_aggregate_no_data
+description: Aggregate data elements with NO data values.
+section: Data elements (aggregate)
+section_order: 6
+summary_uid: yc9MsMnAGCj
 summary_sql: >-
-    select count(*) as value,
-    100*count(*)/ NULLIF( (select count(*) from indicator), 0) as percent
-    from indicator where indicatorid
-    not in (select indicatorid from indicatorgroupmembers);
-details_uid: Is7g6eFibfG
+    WITH dataelements_no_data AS (
+    SELECT uid,name from dataelement where dataelementid in (
+    SELECT dataelementid from  dataelement 
+    where domaintype = 'AGGREGATE'
+    EXCEPT 
+    select DISTINCT dataelementid FROM 
+    datavalue where deleted = FALSE and value != '' ))
+    select count(*) as value ,
+    100*COUNT(*)/ NULLIF( ( select count(*) from dataelement
+    where domaintype = 'AGGREGATE'), 0) as percent
+    from dataelements_no_data;
+details_uid: MzPQlUsApVO
 details_sql: >-
-    SELECT uid,name
-    FROM indicator
-    where indicatorid not in (select indicatorid from indicatorgroupmembers)
+    SELECT uid,name from dataelement where dataelementid in (
+    SELECT dataelementid from  dataelement 
+    where domaintype = 'AGGREGATE'
+    EXCEPT 
+    select DISTINCT dataelementid FROM 
+    datavalue where deleted = FALSE and value != '' )
     ORDER BY name;
+details_id_type: dataElements
 severity: WARNING
 introduction: >
-    All indicators should be in an indicator group. This allows users to find the indicators 
-    more easily in analysis apps and also contributes to having more complete indicators
-    group sets. Maintenance operations can also be made more efficient by applying bulk
-    settings (ex. sharing, filtering) to all indicators within an indicator group.
-details_id_type: indicators
+    Data elements should generally always be associated with data values.
+    If data elements exist in a data set which is active, but there are no
+    data values associated with them, they may not be part of the data entry
+    screens. Alternatively, the data element may have been added but never
+    been associated with a dataset.
 recommendation: >
-    Indicators that are not in a indicator group should be added to a relevant indicator group.
-    If the indicators are not needed, they should be deleted.
+    Consider removing data elements with no data values.
+is_slow: TRUE

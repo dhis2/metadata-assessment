@@ -1,4 +1,4 @@
-# Copyright (c) 2004-2022, University of Oslo
+# Copyright (c) 2022, University of Oslo
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -25,29 +25,24 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ---
-name: indicators_not_grouped
-description: Indicators not in any groups.
-section: Indicators
-section_order: 2
-summary_uid: yh9JEFsml2C
+name: categories_one_default_category
+description: Only one "default" category should exist
+section: Categories
 summary_sql: >-
-    select count(*) as value,
-    100*count(*)/ NULLIF( (select count(*) from indicator), 0) as percent
-    from indicator where indicatorid
-    not in (select indicatorid from indicatorgroupmembers);
-details_uid: Is7g6eFibfG
+  SELECT count(*) AS count FROM dataelementcategory
+  WHERE name = 'default' AND uid != 'GLevLNI9wkl';
 details_sql: >-
-    SELECT uid,name
-    FROM indicator
-    where indicatorid not in (select indicatorid from indicatorgroupmembers)
-    ORDER BY name;
-severity: WARNING
+  SELECT uid, name FROM dataelementcategory
+  WHERE name = 'default' AND uid != 'GLevLNI9wkl'
+  ORDER BY categoryid;
+details_id_type: categories
+severity: SEVERE
 introduction: >
-    All indicators should be in an indicator group. This allows users to find the indicators 
-    more easily in analysis apps and also contributes to having more complete indicators
-    group sets. Maintenance operations can also be made more efficient by applying bulk
-    settings (ex. sharing, filtering) to all indicators within an indicator group.
-details_id_type: indicators
+  There should only exist one category with name and code "default".
+section_order: 2
+summary_uid: XiEYmQgK5Dd
+details_uid: cI5G5z5Yk59
 recommendation: >
-    Indicators that are not in a indicator group should be added to a relevant indicator group.
-    If the indicators are not needed, they should be deleted.
+  Only the category with UID "GLevLNI9wkl" should be named "default" and have code "default".
+  Either rename the conflicting category or move all references to category "GLevLNI9wkl"
+  and then remove the unused conflicting category.

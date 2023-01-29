@@ -25,30 +25,49 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ---
-summary_uid: BQymdCGR1sz
-name: orgunits_multiple_spaces
-description: Organisation units should not have multiple spaces in their names or shortnames.
+summary_uid: fMoHpxuPT18
+name: orgunits_null_island
+description: Organisation units located within 100 km of Null Island (0,0).
 section: Organisation units
 section_order: 6
 summary_sql: >-
-  WITH orgunits_multiple_spaces as (
-  SELECT uid, name from organisationunit 
-  where name ~('\s{2,}') OR shortname ~('\s{2,}')
+  WITH orgunits_null_island as (
+  SELECT a.uid,a.name,ST_AsText(a.geometry)
+  from organisationunit a
+  INNER JOIN(
+  SELECT uid, ST_DistanceSphere(ST_SetSRID(ST_MakePoint(0.0,0.0),4326),
+  geometry) / 1000.0 as distance_km
+  from organisationunit
+  WHERE
+  ST_GeometryType(geometry) = 'ST_Point'
+  ) b ON a.uid = b.uid
+  WHERE  distance_km < 100
   )
   SELECT 
-  COUNT(*) as value,
-  100 * COUNT(*) / NULLIF( (SELECT COUNT(*) FROM organisationunit), 0) as percent
-  from orgunits_multiple_spaces;
-details_uid: spwhfsg5Kkn
+  COUNT(*) as count,
+  100.0 * COUNT(*) / NULLIF( (SELECT COUNT(*) FROM organisationunit), 0) as percent
+  FROM orgunits_null_island;
+details_uid: yBAsnuFkmbj
 details_sql: >-
-  SELECT uid, name, shortname as comment from organisationunit 
-  where name ~('\s{2,}') OR shortname ~('\s{2,}');
+  SELECT a.uid,a.name,ST_AsText(a.geometry) as comment
+  from organisationunit a
+  INNER JOIN(
+  SELECT uid, ST_DistanceSphere(ST_SetSRID(ST_MakePoint(0.0,0.0),4326),
+  geometry) / 1000.0 as distance_km
+  from organisationunit
+  WHERE
+  ST_GeometryType(geometry) = 'ST_Point'
+  ) b ON a.uid = b.uid
+  WHERE  distance_km < 100
+  ORDER BY name;
 details_id_type: organisationUnits
-severity: WARNING
+severity: SEVERE
 introduction: >
-  Names and/or shortnames of organisation units should not contain multiple spaces. They are superfluous
-  and may complicate the location of organisation units when they are searched.
-recommendation: >
-  If the number of affected organisation units is small, the easiest remedy is to correct
-  them directly from the user interface. Another possible option would be to replace
-  all of the multiple spaces using SQL.
+  A common problem when importing coordinates is the inclusion of coordinates situated around
+  the point of [Null Island](https://en.wikipedia.org/wiki/Null_Island). This is the point
+  on the Earth's surface where the Prime Meridian and Equator intersect with a latitude of 0
+  and a longitude of 0. The point also happens to be situated currently in the middle of the
+  ocean. This query identifies any points located within 100 km of the point having latitude
+  and longitude equal to zero.
+recommendation:
+  Update the coordinates of the affected organization unit to the correct location.

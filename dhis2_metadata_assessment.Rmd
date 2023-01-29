@@ -71,7 +71,7 @@ checkVersion <- function(dhis2_version=getDHIS2Version()) {
 
 summary_views <- views$summary_uid
 
-results <- purrr::map(views$summary_uid, function(x)  getSQLView(x, d2_session = d2_session))
+results <- purrr::map(views$summary_uid, function(x)  getSummaryView(x, d2_session = d2_session))
  
 #Separate the results
 #Errors 
@@ -87,12 +87,13 @@ results_with_errors <- results[errored_out] %>%
   results_with_errors <- data.frame(message="All checks ran successfu")
 }
 
-
 results_with_data <- do.call("rbind.data.frame",results[!errored_out])
- 
- 
+
 results_table <- results_with_data %>% 
-  dplyr::left_join(views[,c("summary_uid","section","section_order","details_uid","severity")] , by =c("uid"="summary_uid")) %>% 
+  dplyr::mutate(value = dplyr::coalesce(value,count,"0"),
+                percent = sprintf(as.numeric(dplyr::coalesce(percent,"0")),fmt = '%#.2f')) %>% 
+  dplyr::select(uid,value,percent) %>% 
+  dplyr::left_join(views[,c("summary_uid","description","section","section_order","details_uid","severity")] , by =c("uid"="summary_uid")) %>% 
   dplyr::arrange(section,section_order) %>%
   dplyr::mutate(
     "Details" = paste0(
@@ -206,7 +207,7 @@ and expiation of each of the checks.
 ```{r guidance, echo=FALSE,message=FALSE,results="asis"}
 
 guidance <-  results_with_data %>% 
-  dplyr::left_join(views[,c("summary_uid","section","section_order","details_uid","severity","introduction","recommendation")] , by =c("uid"="summary_uid")) %>% 
+  dplyr::left_join(views[,c("summary_uid","description","section","section_order","details_uid","severity","introduction","recommendation")] , by =c("uid"="summary_uid")) %>% 
   dplyr::arrange(section,section_order) %>%
   dplyr::mutate(details = paste0("<a href='",
                                  d2_session$url,

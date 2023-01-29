@@ -1,4 +1,4 @@
-# Copyright (c) 2021, University of Oslo
+# Copyright (c) 2004-2022, University of Oslo
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -25,28 +25,28 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ---
-  summary_uid: fQiLUgDYrz5
-  name: categories_no_options
-  description: Categories with no category options.
-  section: Categories
-  section_order: 2
-  summary_sql: >-
-    select 'categories_no_options' as indicator,
-    COUNT(*)::varchar as value,
-    (100 * COUNT(*) / (SELECT COUNT(*) FROM dataelementcategory)) || '%' as percent,
-    'Categories without category options' as description
+name: categories_no_options
+description: Categories with no category options
+section: Categories
+summary_sql: >-
+    select
+    COUNT(*) as value,
+    100 * COUNT(*) / NULLIF( (SELECT COUNT(*) FROM dataelementcategory), 0) as percent
     from dataelementcategory where categoryid
     not in (select distinct categoryid from categories_categoryoptions);
-  details_uid: QOI2PBHvksS
-  details_sql: >-
+details_sql: >-
     SELECT uid,name from dataelementcategory
     where categoryid
     not in (select distinct categoryid from categories_categoryoptions)
     ORDER BY name;
-  severity: WARNING
-  introduction: >
-    Categories should always have at least a single category option.
-  recommendation: >
+details_id_type: categories
+severity: WARNING
+introduction: >
+    Categories should always have at least one category option.
+section_order: 1
+summary_uid: YbexVajxsCD
+details_uid: ePVVKF1llbU
+recommendation: >
     Any categories without category options should either be removed from the
     system if they are not in use. Otherwise, appropriate category options
     should be added to the category.

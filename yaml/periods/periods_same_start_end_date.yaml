@@ -25,29 +25,38 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ---
-name: indicators_not_grouped
-description: Indicators not in any groups.
-section: Indicators
-section_order: 2
-summary_uid: yh9JEFsml2C
-summary_sql: >-
-    select count(*) as value,
-    100*count(*)/ NULLIF( (select count(*) from indicator), 0) as percent
-    from indicator where indicatorid
-    not in (select indicatorid from indicatorgroupmembers);
-details_uid: Is7g6eFibfG
-details_sql: >-
-    SELECT uid,name
-    FROM indicator
-    where indicatorid not in (select indicatorid from indicatorgroupmembers)
-    ORDER BY name;
-severity: WARNING
-introduction: >
-    All indicators should be in an indicator group. This allows users to find the indicators 
-    more easily in analysis apps and also contributes to having more complete indicators
-    group sets. Maintenance operations can also be made more efficient by applying bulk
-    settings (ex. sharing, filtering) to all indicators within an indicator group.
-details_id_type: indicators
-recommendation: >
-    Indicators that are not in a indicator group should be added to a relevant indicator group.
-    If the indicators are not needed, they should be deleted.
+  summary_uid: gXmkRzMFQ37
+  name: periods_same_start_end_date
+  description: Periods with the same start and end dates
+  section: Periods
+  section_order: 1
+  summary_sql: >-
+    WITH bad_periods AS (
+    select p1.periodtypeid, p1.startdate, p1.enddate
+    from period p1
+    inner join period p2
+    on p1.periodtypeid = p2.periodtypeid
+    and p1.startdate = p2.startdate
+    where p1.periodid != p2.periodid
+    order by p1.periodtypeid, p1.startdate, p1.enddate )
+    SELECT COUNT(*) as value,
+    100.0* COUNT(*) / NULLIF( (SELECT COUNT(*) FROM period), 0)  as percent
+    FROM bad_periods;
+  details_uid: v12ImzFZQCd
+  details_sql: >-
+    select pt.name as uid,
+    CAST( p1.startdate as text) as name 
+    from period p1
+    inner join period p2
+    on p1.periodtypeid = p2.periodtypeid
+    and p1.startdate = p2.startdate
+    INNER JOIN periodtype pt on p1.periodtypeid = pt.periodtypeid 
+    where p1.periodid != p2.periodid
+    order by p1.periodtypeid, p1.startdate;
+  severity: CRITICAL
+  introduction: >
+    Different periods should not have exactly the same start and end date.
+  details_id_type: periods
+  recommendation: >
+    All references to the duplicate periods should be removed from the system and
+    reassigned. It is recommended to use the period with the lower periodid.

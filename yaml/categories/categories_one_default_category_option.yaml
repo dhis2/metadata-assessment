@@ -1,4 +1,4 @@
-# Copyright (c) 2004-2022, University of Oslo
+# Copyright (c) 2022, University of Oslo
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -25,29 +25,24 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ---
-name: indicators_not_grouped
-description: Indicators not in any groups.
-section: Indicators
-section_order: 2
-summary_uid: yh9JEFsml2C
+name: categories_one_default_category_option
+description: Only one "default" category option should exist
+section: Categories
 summary_sql: >-
-    select count(*) as value,
-    100*count(*)/ NULLIF( (select count(*) from indicator), 0) as percent
-    from indicator where indicatorid
-    not in (select indicatorid from indicatorgroupmembers);
-details_uid: Is7g6eFibfG
+  SELECT count(*) AS count FROM dataelementcategoryoption
+  WHERE name = 'default' AND uid != 'xYerKDKCefk';
 details_sql: >-
-    SELECT uid,name
-    FROM indicator
-    where indicatorid not in (select indicatorid from indicatorgroupmembers)
-    ORDER BY name;
-severity: WARNING
+  SELECT uid, name FROM dataelementcategoryoption
+  WHERE name = 'default' AND uid != 'xYerKDKCefk'
+  ORDER BY categoryoptionid;
+details_id_type: categoryOptions
+severity: SEVERE
 introduction: >
-    All indicators should be in an indicator group. This allows users to find the indicators 
-    more easily in analysis apps and also contributes to having more complete indicators
-    group sets. Maintenance operations can also be made more efficient by applying bulk
-    settings (ex. sharing, filtering) to all indicators within an indicator group.
-details_id_type: indicators
+  There should only exist one category option with name and code "default".
+section_order: 4
+summary_uid: iDLix1p75AM
+details_uid: Q0GuHB94wjd
 recommendation: >
-    Indicators that are not in a indicator group should be added to a relevant indicator group.
-    If the indicators are not needed, they should be deleted.
+  Only the category option with UID "xYerKDKCefk" should be named "default" and have code "default".
+  Either rename the conflicting category option or move all references to category option "xYerKDKCefk"
+  and then remove the unused conflicting category option.

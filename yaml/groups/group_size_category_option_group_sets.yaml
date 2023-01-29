@@ -25,29 +25,40 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ---
-name: indicators_not_grouped
-description: Indicators not in any groups.
-section: Indicators
-section_order: 2
-summary_uid: yh9JEFsml2C
+name: category_option_group_sets_scarce
+description: Category option groups should have at least two members.
+section: Group size
+section_order: 8
+summary_uid: So63EA8N4BX
 summary_sql: >-
-    select count(*) as value,
-    100*count(*)/ NULLIF( (select count(*) from indicator), 0) as percent
-    from indicator where indicatorid
-    not in (select indicatorid from indicatorgroupmembers);
-details_uid: Is7g6eFibfG
+  WITH group_size as (
+  SELECT uid,name,  COALESCE(x.count,0) as count from
+  categoryoptiongroupset
+  LEFT OUTER JOIN (
+  SELECT categoryoptiongroupsetid, COUNT(categoryoptiongroupid) as count from categoryoptiongroupsetmembers
+  GROUP BY categoryoptiongroupsetid) x
+  USING(categoryoptiongroupsetid)
+  ORDER BY name)
+  SELECT COUNT(*) as value,
+   100*COUNT(*) / NULLIF( ( select COUNT(*) from categoryoptiongroupset), 0) as percent
+  from group_size where count < 2;
+details_uid: sChquZNGbUJ
 details_sql: >-
-    SELECT uid,name
-    FROM indicator
-    where indicatorid not in (select indicatorid from indicatorgroupmembers)
-    ORDER BY name;
+  WITH group_size as (
+  SELECT uid,name,  COALESCE(x.count,0) as count from
+  categoryoptiongroupset
+  LEFT OUTER JOIN (
+  SELECT categoryoptiongroupsetid, COUNT(categoryoptiongroupid) as count from categoryoptiongroupsetmembers
+  GROUP BY categoryoptiongroupsetid) x
+  USING(categoryoptiongroupsetid)
+  ORDER BY name)
+  SELECT uid,name,CAST(count as text) FROM
+  group_size where count < 2;
 severity: WARNING
 introduction: >
-    All indicators should be in an indicator group. This allows users to find the indicators 
-    more easily in analysis apps and also contributes to having more complete indicators
-    group sets. Maintenance operations can also be made more efficient by applying bulk
-    settings (ex. sharing, filtering) to all indicators within an indicator group.
-details_id_type: indicators
+  Generally, category option group sets should be composed of at least two category option groups.
 recommendation: >
-    Indicators that are not in a indicator group should be added to a relevant indicator group.
-    If the indicators are not needed, they should be deleted.
+  Considering removing groups with zero or one category option groups, or alternatively, add additional
+  category option groups to the group set to make it more useful.
+details_id_type: categoryOptionGroupSets
+

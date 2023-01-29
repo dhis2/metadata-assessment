@@ -25,29 +25,27 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ---
-name: indicators_not_grouped
-description: Indicators not in any groups.
-section: Indicators
-section_order: 2
-summary_uid: yh9JEFsml2C
-summary_sql: >-
-    select count(*) as value,
-    100*count(*)/ NULLIF( (select count(*) from indicator), 0) as percent
-    from indicator where indicatorid
-    not in (select indicatorid from indicatorgroupmembers);
-details_uid: Is7g6eFibfG
-details_sql: >-
-    SELECT uid,name
-    FROM indicator
-    where indicatorid not in (select indicatorid from indicatorgroupmembers)
-    ORDER BY name;
-severity: WARNING
-introduction: >
-    All indicators should be in an indicator group. This allows users to find the indicators 
-    more easily in analysis apps and also contributes to having more complete indicators
-    group sets. Maintenance operations can also be made more efficient by applying bulk
-    settings (ex. sharing, filtering) to all indicators within an indicator group.
-details_id_type: indicators
-recommendation: >
-    Indicators that are not in a indicator group should be added to a relevant indicator group.
-    If the indicators are not needed, they should be deleted.
+  summary_uid: xL9ClsJAhx2
+  name: program_rules_no_expression
+  description: Program rules with no expression.
+  section: Program rules
+  section_order: 2
+  summary_sql: >-
+    WITH program_rules_no_expression as (
+    SELECT uid,name from programrule where rulecondition IS NULL )
+    SELECT COUNT(*) as value,
+    100.0 * COUNT(*) / NULLIF( (SELECT COUNT(*) FROM programrule), 0) as percent
+    FROM program_rules_no_expression;
+  details_uid: tHtxIYabJze
+  details_sql: >-
+    SELECT uid,name from programrule where rulecondition IS NULL;
+  severity: WARNING
+  introduction: >
+    All program rules should have an expression. Expressions are used by program rules
+    to determine when they should be triggered. Program rules with no expression have 
+    no purpose.
+  details_id_type: programRules
+  recommendation: >
+    Using the DHIS2 user interface, assign an expression to each of the program rules
+    which is missing one. Otherwise, if it is safe to delete the program rule with 
+    no expression, it is recommended to remove it. 

@@ -61,8 +61,7 @@ transformYAMLtoControlFile<-function(include_protected = FALSE, include_slow = F
   all_yaml_files<-list.files("yaml/",pattern="*.yaml",recursive = TRUE,full.names = TRUE)
 
   d <- purrr::map_dfr(all_yaml_files, yaml::read_yaml) %>%
-    dplyr::mutate(is_protected = dplyr::case_when(is.na(is_protected) ~ FALSE,
-    TRUE ~ is_protected))  %>%
+    dplyr::mutate(is_protected = FALSE)  %>%
     dplyr::mutate(is_slow = dplyr::case_when(is.na(is_slow) ~ FALSE,
                                                   TRUE ~ is_slow))  %>%
     dplyr::arrange(section,section_order)
@@ -77,8 +76,8 @@ transformYAMLtoControlFile<-function(include_protected = FALSE, include_slow = F
       dplyr::select(name,description,summary_uid,details_uid) %>%
       dplyr::bind_cols(dups) %>%
       dplyr::filter(has_dup > 0)
-    print(duplicates)
-    stop("Duplicates found!")
+    warning("Duplicates found!")
+    return(duplicates)
   }
 
 #Filter any protected tables
@@ -127,6 +126,27 @@ transformYAMLtoMetadata <- function(include_protected=FALSE,include_slow = FALSE
 
 }
 
+
+addcols <- function(data, cnames, type = "character") {
+  add <- cnames[!cnames %in% names(data)] # Subsets column name list BY only
+  # keeping names that are NOT in the supplied dataframes column names already.
+
+  if (length(add) != 0) { #If their are columns that need to be filled in THEN
+    #Impute the NA value based upon the type provided in the function.
+    # TODO: #Automate the character type or at least a list variable for type.
+    if (type == "character") {
+      data[add] <- NA_character_
+    } else if (type == "numeric") {
+      data[add] <- NA_real_
+    } else if (type == "logical") {
+      data[add] <- NA
+    }
+  }
+
+  return(data)
+
+}
+
 getSQLView <- function(uid, d2_session) {
 
   # #Execute the view first to be sure its fresh
@@ -148,15 +168,16 @@ getSQLView <- function(uid, d2_session) {
     return(NULL)
   }
 
-  if (r$status_code == 500L) {
+  if (r$status_code != 200L) {
     return( list(
       uid = uid,
       response_code = r$status_code,
-      message = httr::content(r)$message
+      message = ifelse(is.null(httr::content(r)$message),"Unknown error",httr::content(r)$message)
     ) )
   }
 
   if (r$status_code == 200L) {
+
     r %>%
       httr::content("text") %>%
       { # nolint
@@ -167,9 +188,24 @@ getSQLView <- function(uid, d2_session) {
             .default = "c"
           )
         ))
-      } %>%
-      dplyr::mutate(uid = uid)
-  }
+      }
+     }
+
+}
+
+getSummaryView <- function(uid,d2_session) {
+   x <- getSQLView(uid,d2_session)
+
+   if (inherits(x,"list")) {
+     return(x)
+   }
+
+   if (inherits(x, "data.frame")) {
+     x %>%
+       addcols(.,c("value","percent","count")) %>%
+       dplyr::mutate(uid = uid) %>%
+       dplyr::select(c("uid","value","percent","count"))
+   }
 
 }
 

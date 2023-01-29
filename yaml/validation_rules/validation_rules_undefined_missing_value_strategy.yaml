@@ -25,29 +25,34 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 ---
-name: indicators_not_grouped
-description: Indicators not in any groups.
-section: Indicators
-section_order: 2
-summary_uid: yh9JEFsml2C
+name: validation_rules_missing_value_strategy_null
+description: All validation rule expressions should have a missing value strategy.
+section: Validation rules
+section_order: 1
+summary_uid: r3zB0LV2vbG
 summary_sql: >-
-    select count(*) as value,
-    100*count(*)/ NULLIF( (select count(*) from indicator), 0) as percent
-    from indicator where indicatorid
-    not in (select indicatorid from indicatorgroupmembers);
-details_uid: Is7g6eFibfG
+    SELECT COUNT(*) as value,
+    100.0 * count(*) / NULLIF( (select count(*) from expression), 0)  as percent
+    from expression where missingvaluestrategy IS NULL;
+details_uid: uvj8KSaZHtw
 details_sql: >-
-    SELECT uid,name
-    FROM indicator
-    where indicatorid not in (select indicatorid from indicatorgroupmembers)
-    ORDER BY name;
-severity: WARNING
+    SELECT a.uid,a.name,'RHS' as comment
+    from validationrule a
+    INNER JOIN expression b on a.rightexpressionid = b.expressionid
+    where b.missingvaluestrategy IS NULL
+    UNION
+    SELECT a.uid,a.name,'LHS' as comment
+    from validationrule a
+    INNER JOIN expression b on a.leftexpressionid = b.expressionid
+    where b.missingvaluestrategy IS NULL;
+details_id_type: validationRules
+severity: SEVERE
 introduction: >
-    All indicators should be in an indicator group. This allows users to find the indicators 
-    more easily in analysis apps and also contributes to having more complete indicators
-    group sets. Maintenance operations can also be made more efficient by applying bulk
-    settings (ex. sharing, filtering) to all indicators within an indicator group.
-details_id_type: indicators
+    Validation rules are composed of a left and right side expression. In certain systems
+    the missing value strategy may not be defined. This may lead to an exception during
+    validation rule analysis. The affected validation rules should be corrected to
+    with an appropriate missing value strategy.
 recommendation: >
-    Indicators that are not in a indicator group should be added to a relevant indicator group.
-    If the indicators are not needed, they should be deleted.
+    Using the results of the the details SQL view, identify the affected validation rules
+    and which side of the rule the missing value strategy has not been specified. Using the
+    maintenance app, make the appropriate corrections and save the rule.
