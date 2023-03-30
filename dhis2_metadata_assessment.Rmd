@@ -70,7 +70,6 @@ checkVersion <- function(dhis2_version=getDHIS2Version()) {
 ```{r sql_view_results, echo=FALSE,message=FALSE,results="asis"}
 
 summary_views <- views$summary_uid
-
 results <- purrr::map(views$summary_uid, function(x)  getSQLView(x, d2_session = d2_session))
  
 #Separate the results
@@ -79,12 +78,10 @@ errored_out <- unlist(lapply(results, function(x) all(class(x) == "list")))
 
 if (any(errored_out)) {
 results_with_errors <- results[errored_out] %>% 
-  do.call("rbind.data.frame",. ) %>% 
-  dplyr::left_join(views[,c("summary_uid","section","description")] , by =c("uid" = "summary_uid")) %>% 
-  dplyr::select("Check" = description,
-                "Message" = message)  
+  purrr::map_df(~purrr::map(.x, function(x) x[[1]])) %>% 
+  dplyr::left_join(views[,c("summary_uid","section","description")] , by =c("uid" = "summary_uid")) 
 } else {
-  results_with_errors <- data.frame(message="All checks ran successfu")
+  results_with_errors <- data.frame(message="All checks ran successfully")
 }
 
 
