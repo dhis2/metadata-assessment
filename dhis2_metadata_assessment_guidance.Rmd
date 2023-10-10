@@ -3,12 +3,12 @@ title: "DHIS2 Metadata Assessment Guidance"
 author: "DHIS2 Implementation Team"
 date: "`r Sys.Date()`"
 output:
-  md_document: default
-  pdf_document: default
-  word_document: default
   html_document:
     df_print: paged
     md_extensions:  -smart
+  pdf_document: default
+  word_document: default
+  md_document: default
 always_allow_html: yes
 ---
   

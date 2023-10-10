@@ -1,4 +1,4 @@
-# Copyright (c) 2021, University of Oslo
+# Copyright (c) 2004-2022, University of Oslo
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,29 +31,28 @@
   section: Categories
   section_order: 7
   summary_sql: >-
-    WITH catoptioncombos_no_catcombo  AS (
-    SELECT uid,name FROM categoryoptioncombo
-    WHERE categoryoptioncomboid NOT IN (SELECT DISTINCT categoryoptioncomboid
-    FROM categorycombos_optioncombos))
-    SELECT 'category_options_no_categories' as indicator,
-    COUNT(*)::varchar as value,
-    ROUND( 100.0 * COUNT(*) / (SELECT COUNT(*)
-    FROM categoryoptioncombo) ) || '%' as percent,
-    'Category options combinations with no category combination.' as description
-    FROM catoptioncombos_no_catcombo;
+      WITH catoptioncombos_no_catcombo  AS (
+      SELECT uid,name FROM categoryoptioncombo
+      WHERE categoryoptioncomboid NOT IN (SELECT DISTINCT categoryoptioncomboid
+      FROM categorycombos_optioncombos))
+      SELECT COUNT(*)as value,
+      100.0 * COUNT(*) / NULLIF( (SELECT COUNT(*)
+      FROM categoryoptioncombo), 0 )  percent
+      FROM catoptioncombos_no_catcombo;
   details_uid: JVz8Rh6xgaB
   details_sql: >-
     SELECT uid,name FROM categoryoptioncombo
-    WHERE categoryoptioncomboid NOT IN (SELECT DISTINCT categoryoptioncomboid
-    FROM categorycombos_optioncombos
+    WHERE categoryoptioncomboid NOT IN (SELECT categoryoptioncomboid
+    FROM categorycombos_optioncombos)
     ORDER BY name;
   severity: WARNING
   introduction: >
     All category option combinations should be associated with a category combo.
     In certain cases, when category combinations are deleted,the linkage between
     a category option combination and a category combination may become corrupted.
+  details_id_type: categoryOptionCombos
   recommendation: >
-    Check if any data is associated with the category combinations in question. Likely,
+    Check if any data is associated with the category option combination in question. Likely,
     the data should either be deleted or migrated to a valid category option combination.
     Any data which is associated with any of these category option combinations will
     not be available through either the data entry modules or any of the analytical apps.
