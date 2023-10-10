@@ -1,4 +1,4 @@
-# DHIS2 Metadata Asssessment Tool
+# DHIS2 Metadata Assessment Tool
 
 ## Purpose of this tool
 
