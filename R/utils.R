@@ -57,7 +57,7 @@ transformYAMLtoJSON <- function(filepath) {
 
 }
 
-transformYAMLtoControlFile<-function(include_protected = FALSE, include_slow = FALSE) {
+transformYAMLtoControlFile<-function(dir_path = getwd(), include_protected = FALSE, include_slow = FALSE) {
   all_yaml_files<-list.files("yaml/",pattern="*.yaml",recursive = TRUE,full.names = TRUE)
 
   d <- purrr::map_dfr(all_yaml_files, yaml::read_yaml) %>%
@@ -126,6 +126,39 @@ transformYAMLtoMetadata <- function(include_protected=FALSE,include_slow = FALSE
 
 }
 
+transformYAMLtoExporter <- function(dir_path = getwd(),include_protected=TRUE,include_slow = FALSE) {
+  r <- transformYAMLtoControlFile(dir_path = dir_path,include_protected,include_slow)
+  #Prefix with dhis
+  r$name <- paste0('dhis_', r$name)
+  #Use ratio instead of percentage
+  r$summary_sql <- gsub("100?([\\.0 ]+)\\*","", r$summary_sql)
+  r$summary_sql <- gsub("as percent","as ratio", r$summary_sql)
+  appendWithSpaces <-function(string,path,indent){
+    if (indent > 0) {
+      indent_prefix <- paste(rep(" ",indent),sep="",collapse="")
+    } else {
+      indent_prefix <- ""
+    }
+
+
+    cat(paste0(indent_prefix,string),file=path,append = TRUE, sep="\n")
+  }
+
+  file_name <- "dhis_metadata_sql_exporter.yaml"
+  unlink(file_name)
+  cat("collector_name: dhis_system",file=file_name, sep="\n")
+  appendWithSpaces("metrics:", path=file_name,indent = 0)
+
+  for (i in seq_len(NROW(r))) {
+    appendWithSpaces(paste0("- metric_name: ",r$name[i]), path=file_name,indent = 2)
+    appendWithSpaces("type: gauge", path=file_name,indent = 4)
+    appendWithSpaces(paste0("help : ", paste0("'",r$description[i],"'")), path=file_name,indent = 4)
+    appendWithSpaces("values: [ratio]", path=file_name,indent = 4)
+    appendWithSpaces("query: |", path=file_name,indent = 4)
+    appendWithSpaces(r$summary_sql[i], path=file_name,indent = 6)
+  }
+
+}
 
 addcols <- function(data, cnames, type = "character") {
   add <- cnames[!cnames %in% names(data)] # Subsets column name list BY only
