@@ -31,14 +31,14 @@ parsed by a number of different programming languages. It is also exceptionally
 easy to read.  Each check included in this tool has a separate YAML file, 
 which consists of a number of key value pairs. Each of these keys will be explained below. 
 
-- *summary_uid*: A predefined DHIS2 UID which is used to identify the 
-summary SQL query for this check.
 - *name*: The name of the SQL query. This name should be relatively short but descriptive. It should also
 be written in snake case so that a valid database view name can be created using this field.
 - *description*: A short description of the issue.
 - *section*: Used in the R-markdown report to group related issues together. 
 Generally these are related metadata objects like indicators or data elements.
 - *section_order*: Used in the R-markdown report to order issues within a section.
+- *summary_uid*: A predefined DHIS2 UID which is used to identify the 
+summary SQL query for this check.
 - *summary_sql*: An SQL query which is used to produce a single row which summarizes
 the particular issue. Each query should return four columns and one row.
      - indicator: This should be the same as the `name` field above.
@@ -49,11 +49,12 @@ the particular issue. Each query should return four columns and one row.
        total number of objects in the same class.
      - description: A brief description of the the issue, probably the same as 
        the description field above.
+- *details_uid*: UID for the query which should provide a full list of all issues.
 - *details_sql*: An SQL query which should return one or more rows of all 
 metadata objects which violate this particular metadata check. At the very least,
 the query should consist of the UID and name of the object, and in certain cases
 may contain other fields which will make the identification of the specific object easier in order to rectify the problem.
-- *is_slow*: Whether the query is potentially long-running/slow, typically because it queries against the datavalue table.
+- *details_id_type*: TODO
 - *severity*: This field is used to indicate the overall severity of a particular problem. 
     - INFO: Indicates that this is for information only.
     - WARNING: A warning indicates that this may be a problem, but not 
@@ -64,6 +65,8 @@ may contain other fields which will make the identification of the specific obje
     error or system crashes.
 - *introduction*: A brief synopsis of the problem including its significance and origin.
 - *recommendation*: A recommended procedure of how to address the issue is included in this field. 
+- *is_slow*: Whether the query is potentially long-running/slow, typically because it queries against the datavalue table.
+- *is_protected*: Flag to indicate whether the query accesses protected tables. These queries cannot be accessed via the API
 
 
 An R Markdown report has been included to run all of 
