@@ -138,8 +138,9 @@ getSQLView <- function(uid, d2_session) {
   # }
 
 
-  r <- tryCatch( httr::GET(paste0(d2_session$url,"api/sqlViews/",uid,"/data.csv"),
+  r <- tryCatch( httr::GET(paste0(d2_session$url,"api/sqlViews/",uid,"/data.json"),
                      handle=d2_session,
+                     content_type_json(),
                      timeout(600)) ,
                  error = function(e) print(e) )
 
@@ -157,18 +158,19 @@ getSQLView <- function(uid, d2_session) {
   }
 
   if (r$status_code == 200L) {
-    r %>%
+   resp <-  r %>%
       httr::content("text") %>%
-      { # nolint
-        suppressWarnings(readr::read_csv(
-          .,
-          col_names = TRUE,
-          col_types = readr::cols(
-            .default = "c"
-          )
-        ))
-      } %>%
-      dplyr::mutate(uid = uid)
+      jsonlite::fromJSON(.)
+
+   data <- as.data.frame(resp$listGrid$rows)
+   #If there are no rows...this should never happen
+   if (NROW(data) == 0) {
+     return(NULL)
+   }
+
+   names(data) <- resp$listGrid$headers$name
+   data$uid <- uid
+   return(data)
   }
 
 }
