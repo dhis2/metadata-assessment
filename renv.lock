@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.3.0",
+    "Version": "4.3.1",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -723,18 +723,6 @@
       ],
       "Hash": "0f7cd2962e3044bb940cca4f4b5cecbe"
     },
-    "packrat": {
-      "Package": "packrat",
-      "Version": "0.9.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "tools",
-        "utils"
-      ],
-      "Hash": "481428983c19a7c443f7ea1beff0a2de"
-    },
     "pacman": {
       "Package": "pacman",
       "Version": "0.5.1",
@@ -924,31 +912,6 @@
         "yaml"
       ],
       "Hash": "75a01be060d800ceb14e32c666cacac9"
-    },
-    "rsconnect": {
-      "Package": "rsconnect",
-      "Version": "0.8.29",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "curl",
-        "digest",
-        "jsonlite",
-        "openssl",
-        "packrat",
-        "rstudioapi",
-        "tools",
-        "yaml"
-      ],
-      "Hash": "fe178fc15af80952f546aafedf655b36"
-    },
-    "rstudioapi": {
-      "Package": "rstudioapi",
-      "Version": "0.14",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "690bd2acc42a9166ce34845884459320"
     },
     "sass": {
       "Package": "sass",
