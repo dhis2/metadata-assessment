@@ -85,16 +85,15 @@ operating system.
 R Studio for your operating system. 
 - [Download](https://git-scm.com/downloads) and install the git source control management software for your operating system.
 - Clone the [source](https://github.com/dhis2/metadata-assessment) of this repository to your system. 
-- This package uses the `renv` system for dependency management. Once you have created a new project in Rstudio with the `metadata-assessment` package, you should run the following commands to install all dependencies.
+- Install dependencies by invoking the following commands in the R console. 
 
 ```R
-install.packages('renv')
-require('renv')
-renv::activate() 
-renv::restore()
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(jsonlite, httr, purrr,knitr,magrittr,ggplot2,DT,dplyr,yaml,knitr,rmarkdown,dplyr,readr)
 ```
 
-- Edit the file called `.Rprofile` in the top level directory of the cloned git repository. This file will be created when you invoke `renv::activate()`. 
+- Edit or create the file called `.Rprofile` in the top level directory of the cloned git repository.
+
 This should only be done on a private computer, since you will need to store authentication 
 details in this file. Alternatively, you can execute the commands in the R 
 console, if you are not comfortable storing authentication details in a 
