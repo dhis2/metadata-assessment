@@ -28,7 +28,7 @@
 summary_uid: kjZFYBcH2L2
 name: data_elements_excess_groupset_membership
 description: Data elements which belong to multiple groups in a group set.
-section: data_elements
+section: Data elements (aggregate)
 section_order: 10
 summary_sql: >-
   WITH des_multiple_groups as (
