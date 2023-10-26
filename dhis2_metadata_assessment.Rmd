@@ -85,7 +85,7 @@ results_with_errors <- results[errored_out] %>%
   dplyr::select("Check" = description,
                 "Message" = message)  
 } else {
-  results_with_errors <- data.frame(message="All checks ran successfu")
+  results_with_errors <- data.frame(message="All checks ran successfully.")
 }
 
 results_with_data <- do.call("rbind.data.frame",results[!errored_out])
